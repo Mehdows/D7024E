@@ -1,13 +1,14 @@
-FROM alpine:latest
+FROM golang:latest
 
 RUN mkdir /build
 WORKDIR /build
 
 RUN export GO111MODULE=on
-RUN go get https://github.com/Mehdows/D7024E/test/GOWEBAPI/main
+#RUN go get github.com/Mehdows/D7024E/test/GOWEBAPI/main
 RUN cd /build && git clone https://github.com/Mehdows/D7024E.git
 
-RUN cd /build/D7024E/test/GETWEBAPI && go build -o main .
+RUN cd /build/D7024E/test/GOWEBAPI && go build
+
 
 EXPOSE 8080
 
