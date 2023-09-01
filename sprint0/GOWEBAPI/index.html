@@ -14,6 +14,11 @@
     </div>
     <input type="text" id="input" placeholder="enter a port">
 
+    <!--add a text field which can be changed by code-->
+    <div id="text">
+        <p id="text1">0</p>
+    </div>
+
     <script>
         //pass the port number to a golang function when the button is clicked
         document.getElementById("gt").addEventListener("click", function(){
@@ -26,7 +31,6 @@
             //pass the port number to a golang function
             go.sendPacket(port);
         });
-
     </script>
 
 </body>
