@@ -35,7 +35,7 @@ func sendPacket(port int) {
 }
 
 func ping(w http.ResponseWriter, r *http.Request) {
-	var filename = "index.html"
+	var filename = "/index.html"
 	t, err := template.ParseFiles(filename)
 	if err != nil {
 		panic(err)
