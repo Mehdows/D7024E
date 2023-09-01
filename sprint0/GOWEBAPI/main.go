@@ -2,6 +2,7 @@ package main
 
 import (
 	"html/template"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -50,7 +51,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	print(filepath.Dir(ex) + "\n")
+	log.Println(filepath.Dir(ex) + "\n")
 	http.HandleFunc("/", ping)
 	// http handle function for index.css
 	http.Handle("../index.css", http.FileServer(http.Dir("./")))
