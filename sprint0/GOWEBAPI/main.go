@@ -44,5 +44,6 @@ func ping(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-
+	http.HandleFunc("/", ping)
+	http.ListenAndServe(":8080", nil)
 }
