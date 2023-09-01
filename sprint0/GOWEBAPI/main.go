@@ -3,6 +3,8 @@ package main
 import (
 	"html/template"
 	"net/http"
+	"os"
+	"path/filepath"
 )
 
 var SERVER_PORT string
@@ -44,6 +46,11 @@ func ping(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	print(filepath.Dir(ex) + "\n")
 	http.HandleFunc("/", ping)
 	// http handle function for index.css
 	http.Handle("../index.css", http.FileServer(http.Dir("./")))
