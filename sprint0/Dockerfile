@@ -7,7 +7,7 @@ RUN export GO111MODULE=on
 #RUN go get github.com/Mehdows/D7024E/test/GOWEBAPI/main
 RUN cd /build && git clone https://github.com/Mehdows/D7024E.git
 
-RUN cd /build/D7024E/test/GOWEBAPI && go build
+RUN cd /build/D7024E/test/GOWEBAPI && go build -o main .
 
 
 EXPOSE 8080
