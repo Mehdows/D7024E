@@ -45,5 +45,9 @@ func ping(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/", ping)
+	// http handle function for index.css
+	http.Handle("/index.css", http.FileServer(http.Dir("./")))
+
 	http.ListenAndServe(":8080", nil)
+
 }
