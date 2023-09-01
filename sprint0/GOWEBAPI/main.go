@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 )
@@ -20,6 +21,8 @@ var response Response
 var recieved int
 var sent int
 
+var location string = "/D7024E/SPRINT0/GOWEBAPI/"
+
 func setResponse() {
 	response = Response{"Success!"}
 }
@@ -35,7 +38,7 @@ func sendPacket(port int) {
 }
 
 func ping(w http.ResponseWriter, r *http.Request) {
-	var filename = "/index.html"
+	var filename = fmt.Sprint(location, "/index.html")
 	t, err := template.ParseFiles(filename)
 	if err != nil {
 		panic(err)
@@ -46,7 +49,7 @@ func ping(w http.ResponseWriter, r *http.Request) {
 func main() {
 	http.HandleFunc("/", ping)
 	// http handle function for index.css
-	http.Handle("/index.css", http.FileServer(http.Dir("./")))
+	http.Handle(fmt.Sprint(location, "/index.css"), http.FileServer(http.Dir("./")))
 
 	http.ListenAndServe(":8080", nil)
 
