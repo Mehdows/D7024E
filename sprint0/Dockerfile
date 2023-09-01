@@ -9,7 +9,7 @@ RUN cd /build && git clone --branch marcus https://github.com/Mehdows/D7024E.git
 RUN cd /build/D7024E/ && git pull  
 RUN cd /build/D7024E/sprint0/GOWEBAPI && go build -o main .
 
-
+WORKDIR /build/D7024E/sprint0/GOWEBAPI
 EXPOSE 8080
 
 ENTRYPOINT [ "/build/D7024E/sprint0/GOWEBAPI/main" ]
