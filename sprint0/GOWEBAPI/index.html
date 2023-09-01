@@ -15,19 +15,32 @@
     <input type="text" id="input" placeholder="enter a port">
 
     <script>
-        //pass the port number to a golang function when the button is clicked
+        // pass the port number to a Go function when the button is clicked
         document.getElementById("gt").addEventListener("click", function(){
             var port = document.getElementById("input").value;
-            //check if the port is a number
-            if(isNaN(port)){
+            // check if the port is a number
+            if (isNaN(port)) {
                 alert("please enter a number");
                 return;
             }
-            //pass the port number to a golang function
-            go.sendPacket(port);
+            // send an HTTP request to the Go backend
+            fetch(`/sendPacket?port=${port}`, {
+                method: "POST",
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.text();
+            })
+            .then(data => {
+                // Handle the response from the Go backend
+                console.log(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
         });
-
     </script>
-
 </body>
 </html>

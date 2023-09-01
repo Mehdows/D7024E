@@ -1,11 +1,14 @@
 FROM golang:latest
 
+RUN apt-get update && apt-get install inetutils-ping -y
+
 RUN mkdir /build
 WORKDIR /build
 
 RUN export GO111MODULE=on
 #RUN go get github.com/Mehdows/D7024E/test/GOWEBAPI/main
 RUN cd /build && git clone https://github.com/Mehdows/D7024E.git
+RUN cd /build/D7024E/ && git pull
 
 RUN cd /build/D7024E/test/GOWEBAPI && go build -o main .
 
