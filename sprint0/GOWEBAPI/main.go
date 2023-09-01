@@ -24,15 +24,15 @@ func setResponse() {
 	response = Response{"Success!"}
 }
 
-/*
 func sendPacket(port int) {
 	packets_sent++
 	c := newClient(CLIENT_ADDRESS)
 	setResponse()
 
-	//res := exchangeJson(c, response)
+	res := exchangeJson(c, response)
+	print(res)
 
-}*/
+}
 
 func ping(w http.ResponseWriter, r *http.Request) {
 	var filename = "index.html"
