@@ -2,7 +2,6 @@ package main
 
 import (
 	"html/template"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -38,7 +37,7 @@ func sendPacket(port int) {
 }
 
 func ping(w http.ResponseWriter, r *http.Request) {
-	var filename = "../index.html"
+	var filename = "index.html"
 	t, err := template.ParseFiles(filename)
 	if err != nil {
 		panic(err)
@@ -51,10 +50,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	log.Println(filepath.Dir(ex) + "\n")
+	test := filepath.Dir(ex) + "\n"
+	panic(test)
 	http.HandleFunc("/", ping)
 	// http handle function for index.css
-	http.Handle("../index.css", http.FileServer(http.Dir("./")))
+	http.Handle("index.css", http.FileServer(http.Dir("./")))
 
 	http.ListenAndServe(":8080", nil)
 
