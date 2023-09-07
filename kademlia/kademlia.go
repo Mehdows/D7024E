@@ -9,7 +9,7 @@ import (
 type Kademlia struct {
 	routingTable *RoutingTable
 	network      *Network
-	dict 	   map[string]string
+	dictionary   *map[string][]byte
 }
 
 func (kademlia *Kademlia) LookupContact(target *Contact) {
@@ -26,4 +26,20 @@ func (kademlia *Kademlia) Store(data []byte) {
 	kademlia.dict[key] = string(data)
 	fmt.Println("Stored data with key: ", key)
 	fmt.Println("Stored hash: ", sha1)
+}
+
+func HandleRequest(request *Network, function string) {
+	switch function {
+	case "ping":
+		request.SendPongMessage()
+	case "lookup_contact":
+		// TODO
+	case "lookup_data":
+		// TODO
+	case "store":
+		// TODO
+	default:
+		fmt.Println(function)
+		panic("Invalid request " + function)
+	}
 }
