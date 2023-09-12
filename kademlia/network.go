@@ -10,6 +10,7 @@ import (
 type Network struct {
 	connection *net.Conn
 	contact    *Contact
+	kademlia   *Kademlia
 }
 
 func Listen(ip string, port int) {

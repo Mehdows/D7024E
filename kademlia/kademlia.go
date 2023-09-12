@@ -7,13 +7,40 @@ import (
 )
 
 type Kademlia struct {
+	me 	 Contact
 	routingTable *RoutingTable
-	network      *Network
-	dictionary   *map[string][]byte
+	dictionary   map[string][]byte
 }
 
-func (kademlia *Kademlia) LookupContact(target *Contact) {
-	// TODO
+func NewKademliaNode(adress string) (kademlia Kademlia) {
+	KademliaID := NewKademliaID(adress)
+	kademlia.me = NewContact(KademliaID, adress)
+	kademlia.routingTable = NewRoutingTable(kademlia.me)
+	kademlia.dictionary = make(map[string][]byte)
+	return 
+}
+
+func (kademlia *Kademlia) LookupContact(target *Contact) (closestNode *Contact){
+	// list of k-closest nodes
+	closestK := kademlia.routingTable.FindClosestContacts(target.ID, bucketSize)
+
+	if len(closestK) == 0 {
+		fmt.Println("No contacts found")
+		return
+	}	
+
+	closest := closestK[0]
+
+	// find closest node
+	for i := 0; i < len(closestK); i++ {
+		if closestK[i].ID.CalcDistance(target.ID).Less(closest.ID.CalcDistance(target.ID)) {
+			closest = closestK[i]
+		}
+	}
+
+	// return closest node
+	return &closest
+
 }
 
 func (kademlia *Kademlia) LookupData(hash string) {
@@ -23,7 +50,6 @@ func (kademlia *Kademlia) LookupData(hash string) {
 func (kademlia *Kademlia) Store(data []byte) {
 	sha1 := sha1.Sum([]byte(data))
 	key := hex.EncodeToString(sha1[:])
-	kademlia.dict[key] = string(data)
 	fmt.Println("Stored data with key: ", key)
 	fmt.Println("Stored hash: ", sha1)
 }

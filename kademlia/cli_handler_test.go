@@ -1,14 +1,15 @@
 package d7024e
 
 import (
+	"testing"
 	"bufio"
 	"fmt"
 	"os"
 	"strings"
 )
 
+func TestCli_handler(t *testing.T) {
 
-func Cli_handler() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Enter Text: ")
