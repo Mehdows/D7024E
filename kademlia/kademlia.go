@@ -10,14 +10,16 @@ import (
 type Kademlia struct {
 	me           Contact
 	routingTable *RoutingTable
+	network      *Network
 	dictionary   map[string][]byte
 }
 
-func NewKademliaNode(adress string) (kademlia Kademlia) {
-	KademliaID := NewKademliaID(adress)
-	kademlia.me = NewContact(KademliaID, adress)
+func NewKademliaNode(address string, ) (kademlia Kademlia) {
+	KademliaID := NewRandomKademliaID()
+	kademlia.me = NewContact(KademliaID, address)
 	kademlia.routingTable = NewRoutingTable(kademlia.me)
 	kademlia.dictionary = make(map[string][]byte)
+	kademlia.network = &Network{&kademlia}
 	return
 }
 
@@ -55,14 +57,17 @@ func (kademlia *Kademlia) Store(data []byte) {
 	fmt.Println("Stored hash: ", sha1)
 }
 
-func (Kademlia *Kademlia) findKBucket() {
-	// TODO
+func (Kademlia *Kademlia) Ping(id *KademliaID, address string) {
+	Contact := NewContact(id, address)
+	message := NewPingMessage(&Kademlia.me, &Contact)
+	Kademlia.network.SendPingMessage(message)
 }
 
 func (Kademlia *Kademlia) HandleRequest(conn net.Conn, message Message) {
 	switch message.ID {
 	case messageTypePing:
-		Kademlia.network.SendPongMessage(conn)
+		response := NewPongMessage(&Kademlia.me, message.sender)
+		Kademlia.network.SendPongMessage(response, conn)
 	case messageTypeStore:
 		// TODO
 	case messageTypeFindNode:
@@ -70,6 +75,6 @@ func (Kademlia *Kademlia) HandleRequest(conn net.Conn, message Message) {
 	case messageTypeFindValue:
 
 	default:
-		panic("Invalid request " + string(message.ID))
+		panic("Invalid request " + string(rune(message.ID)))
 	}
 }

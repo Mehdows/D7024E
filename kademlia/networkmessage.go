@@ -1,6 +1,7 @@
 package d7024e
 
 import (
+	"bytes"
 	"encoding/json"
 )
 
@@ -35,6 +36,26 @@ type responseFindNodeData struct {
 	Contacts []Contact
 }
 
+func NewPingMessage(sender *Contact, receiver *Contact) Message {
+	return Message{
+		sender:     sender,
+		receiver:   receiver,
+		ID:         messageTypePing,
+		IsResponse: false,
+	}
+}
+
+func NewPongMessage(sender *Contact, receiver *Contact) Message {
+	return Message{
+		sender:     sender,
+		receiver:   receiver,
+		ID:         messageTypePing,
+		IsResponse: true,
+	}
+}
+
+
+
 // implement serialization with marshal
 func SerializeMessage(message *Message) []byte {
 
@@ -48,7 +69,8 @@ func SerializeMessage(message *Message) []byte {
 }
 
 func DeserializeMessage(data []byte) Message {
-	//make buffer
+	//remove empty bytes
+	data = bytes.Trim(data, "\x00")
 	err := json.Unmarshal(data, &Message{})
 	if err != nil {
 		panic(err)

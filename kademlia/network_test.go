@@ -6,12 +6,13 @@ import (
 
 func TestSendPingMessage(t *testing.T) {
 
-	go Listen("localhost", 8080)
-	net := Network{}
-	contact := NewContact(NewRandomKademliaID(), "localhost:8080")
-	net.contact = &contact
-	res := net.SendPingMessage()
+	Kademlia := NewKademliaNode("localhost:8080")
+	go Kademlia.network.Listen()
+	contact := NewContact(Kademlia.me.ID, "localhost:8080")
+	res := Kademlia.network.SendPingMessage(NewPingMessage(&contact, &contact))
+
 	if res != "pong" {
 		t.Errorf("SendPingMessage() = %s; want pong", res)
 	}
+	
 }
