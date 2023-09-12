@@ -5,6 +5,7 @@ import (
 )
 
 func TestSendPingMessage(t *testing.T) {
+
 	go Listen("localhost", 8080)
 	net := Network{}
 	contact := NewContact(NewRandomKademliaID(), "localhost:8080")

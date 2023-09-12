@@ -1,5 +1,7 @@
 package d7024e
 
+import "net"
+
 type Kademlia struct {
 	routingTable *RoutingTable
 	network      *Network
@@ -18,17 +20,21 @@ func (kademlia *Kademlia) Store(data []byte) {
 	// TODO
 }
 
-func HandleRequest(request *Network, function string) {
-	switch function {
-	case "ping":
-		request.SendPongMessage()
-	case "lookup_contact":
+func (Kademlia *Kademlia) findKBucket() {
+	// TODO
+}
+
+func (Kademlia *Kademlia) HandleRequest(conn net.Conn, message Message) {
+	switch message.ID {
+	case messageTypePing:
+		Kademlia.network.SendPongMessage(conn)
+	case messageTypeStore:
 		// TODO
-	case "lookup_data":
+	case messageTypeFindNode:
 		// TODO
-	case "store":
-		// TODO
+	case messageTypeFindValue:
+
 	default:
-		panic("Invalid request " + function)
+		panic("Invalid request " + string(message.ID))
 	}
 }
