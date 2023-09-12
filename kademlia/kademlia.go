@@ -1,7 +1,5 @@
 package d7024e
 
-import "fmt"
-
 type Kademlia struct {
 	routingTable *RoutingTable
 	network      *Network
@@ -31,7 +29,6 @@ func HandleRequest(request *Network, function string) {
 	case "store":
 		// TODO
 	default:
-		fmt.Println(function)
 		panic("Invalid request " + function)
 	}
 }

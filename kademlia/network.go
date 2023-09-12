@@ -47,6 +47,60 @@ func handleConnection(conn net.Conn) {
 	HandleRequest(&network, function)
 }
 
+// SendPingMessage sends a ping message to the contact
+func (network *Network) SendPingMessage() string {
+
+	hash := network.contact.ID.String()
+	message := []byte(hash + " ping")
+
+	network.sendMessage(message)
+
+	dataString := network.listenResponse()
+
+	network.closeConnection()
+
+	pongMessage := strings.Split(dataString, " ")
+
+	return pongMessage[1]
+}
+
+func (network *Network) SendPongMessage() {
+	conn := *network.connection
+	hash := network.contact.ID.String()
+	message := []byte(hash + " pong")
+	conn.Write(message)
+}
+
+func (network *Network) SendFindContactMessage(contact *Contact) {
+	// TODO
+}
+
+func (network *Network) SendFindDataMessage(hash string) {
+	// TODO
+}
+
+func (network *Network) SendStoreMessage(data []byte) {
+	//create message
+	hash := network.contact.ID.String()
+	message := []byte(hash + " store " + string(data))
+	network.sendMessage(message)
+
+	_ = network.listenResponse()
+	network.closeConnection()
+	//TODO MAYBE
+}
+
+func (network *Network) sendMessage(message []byte) {
+	network.getContactConnection()
+	conn := *network.connection
+	conn.Write(message)
+}
+
+func (network *Network) closeConnection() {
+	conn := *network.connection
+	conn.Close()
+}
+
 func (network *Network) getContactConnection() {
 	address := network.contact.Address
 	conn, err := net.Dial("tcp", address)
@@ -66,37 +120,4 @@ func (network *Network) listenResponse() string {
 	data = bytes.Trim(data, "\x00")
 	dataString := string(data[:])
 	return dataString
-}
-
-// SendPingMessage sends a ping message to the contact
-func (network *Network) SendPingMessage() string {
-	//Send ping message to contact with net
-	network.getContactConnection()
-	conn := *network.connection
-	defer conn.Close()
-	hash := network.contact.ID.String()
-	conn.Write([]byte(hash + " ping"))
-
-	dataString := network.listenResponse()
-	pongMessage := strings.Split(dataString, " ")
-	return pongMessage[1]
-}
-
-func (network *Network) SendPongMessage() {
-	conn := *network.connection
-	hash := network.contact.ID.String()
-	conn.Write([]byte(hash + " pong"))
-}
-
-// SendFindContactMessage sends a find contact message to the
-func (network *Network) SendFindContactMessage(contact *Contact) {
-	// TODO
-}
-
-func (network *Network) SendFindDataMessage(hash string) {
-	// TODO
-}
-
-func (network *Network) SendStoreMessage(data []byte) {
-	// TODO
 }
