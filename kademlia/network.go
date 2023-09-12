@@ -70,8 +70,9 @@ func (network *Network) SendPongMessage(message Message, conn net.Conn) {
 	conn.Write(data)
 }
 
-func (network *Network) SendFindContactMessage(contact *Contact) {
-	// TODO
+func (network *Network) SendFindContactMessage(message Message) {
+	
+
 }
 
 func (network *Network) SendFindDataMessage(hash string) {

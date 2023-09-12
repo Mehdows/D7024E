@@ -54,6 +54,18 @@ func NewPongMessage(sender *Contact, receiver *Contact) Message {
 	}
 }
 
+func NewFindNodeMessage(sender *Contact, receiver *Contact, target *KademliaID) Message {
+	return Message{
+		sender:     sender,
+		receiver:   receiver,
+		ID:         messageTypeFindNode,
+		IsResponse: false,
+		Data: findNodeData{
+			Target: target,
+		},
+	}
+}
+
 
 
 // implement serialization with marshal
