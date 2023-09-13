@@ -91,7 +91,7 @@ func (network *Network) SendPongMessage() {
 
 // SendFindContactMessage sends a find contact message to the
 func (network *Network) SendFindContactMessage(contact *Contact) {
-	// TODO
+	
 }
 
 func (network *Network) SendFindDataMessage(hash string) {
