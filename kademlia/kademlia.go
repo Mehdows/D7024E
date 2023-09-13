@@ -4,30 +4,33 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
+	"net"
 )
 
 type Kademlia struct {
-	me 	 Contact
+	me           Contact
 	routingTable *RoutingTable
+	network      *Network
 	dictionary   map[string][]byte
 }
 
-func NewKademliaNode(adress string) (kademlia Kademlia) {
-	KademliaID := NewKademliaID(adress)
-	kademlia.me = NewContact(KademliaID, adress)
+func NewKademliaNode(address string, ) (kademlia Kademlia) {
+	KademliaID := NewRandomKademliaID()
+	kademlia.me = NewContact(KademliaID, address)
 	kademlia.routingTable = NewRoutingTable(kademlia.me)
 	kademlia.dictionary = make(map[string][]byte)
-	return 
+	kademlia.network = &Network{&kademlia}
+	return
 }
 
-func (kademlia *Kademlia) LookupContact(target *Contact) (closestNode *Contact){
+func (kademlia *Kademlia) LookupContact(target *Contact) (closestNode *Contact) {
 	// list of k-closest nodes
 	closestK := kademlia.routingTable.FindClosestContacts(target.ID, bucketSize)
 
 	if len(closestK) == 0 {
 		fmt.Println("No contacts found")
 		return
-	}	
+	}
 
 	closest := closestK[0]
 
@@ -54,18 +57,24 @@ func (kademlia *Kademlia) Store(data []byte) {
 	fmt.Println("Stored hash: ", sha1)
 }
 
-func HandleRequest(request *Network, function string) {
-	switch function {
-	case "ping":
-		request.SendPongMessage()
-	case "lookup_contact":
+func (Kademlia *Kademlia) Ping(id *KademliaID, address string) {
+	Contact := NewContact(id, address)
+	message := NewPingMessage(&Kademlia.me, &Contact)
+	Kademlia.network.SendPingMessage(message)
+}
+
+func (Kademlia *Kademlia) HandleRequest(conn net.Conn, message Message) {
+	switch message.ID {
+	case messageTypePing:
+		response := NewPongMessage(&Kademlia.me, message.sender)
+		Kademlia.network.SendPongMessage(response, conn)
+	case messageTypeStore:
 		// TODO
-	case "lookup_data":
+	case messageTypeFindNode:
 		// TODO
-	case "store":
-		// TODO
+	case messageTypeFindValue:
+
 	default:
-		fmt.Println(function)
-		panic("Invalid request " + function)
+		panic("Invalid request " + string(rune(message.ID)))
 	}
 }

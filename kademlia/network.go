@@ -1,21 +1,19 @@
 package d7024e
 
 import (
-	"bytes"
-	"fmt"
 	"net"
-	"strings"
 )
 
+
+
 type Network struct {
-	connection *net.Conn
-	contact    *Contact
-	kademlia   *Kademlia
+	kademlia *Kademlia
 }
 
-func Listen(ip string, port int) {
+func (network *Network) Listen() {
 	for {
-		ln, err := net.Listen("tcp", ip+":"+fmt.Sprint(port))
+		address := network.kademlia.me.Address
+		ln, err := net.Listen("tcp", address)
 		if err != nil {
 			panic(err)
 		}
@@ -23,73 +21,55 @@ func Listen(ip string, port int) {
 		if err != nil {
 			panic(err)
 		}
-		go handleConnection(conn)
+		go network.handleConnection(conn)
 	}
 
 }
 
-func handleConnection(conn net.Conn) {
-	//read data from connection
-
-	network := Network{}
-	network.connection = &conn
-
-	s := network.listenResponse()
-
-	split := strings.Split(s, " ")
-
-	hash := split[0]
-	function := split[1]
-	address := conn.RemoteAddr().String()
-	kademliaID := NewKademliaID(hash)
-	Contact := NewContact(kademliaID, address)
-	network.contact = &Contact
-
-	HandleRequest(&network, function)
-}
-
-func (network *Network) getContactConnection() {
-	address := network.contact.Address
-	conn, err := net.Dial("tcp", address)
-	if err != nil {
-		panic(err)
-	}
-	network.connection = &conn
-}
-
-func (network *Network) listenResponse() string {
-	conn := *network.connection
+func (network *Network) handleConnection(conn net.Conn) {
 	data := make([]byte, 1024)
 	_, err := conn.Read(data)
+
 	if err != nil {
 		panic(err)
 	}
-	data = bytes.Trim(data, "\x00")
-	dataString := string(data[:])
-	return dataString
+
+	message := DeserializeMessage(data)
+
+	network.kademlia.HandleRequest(conn, message)
 }
 
 // SendPingMessage sends a ping message to the contact
-func (network *Network) SendPingMessage() string {
-	//Send ping message to contact with net
-	network.getContactConnection()
-	conn := *network.connection
-	defer conn.Close()
-	hash := network.contact.ID.String()
-	conn.Write([]byte(hash + " ping"))
+func (network *Network) SendPingMessage(message Message) string {
+	data := SerializeMessage(&message)
+	conn, err := net.Dial("tcp", message.receiver.Address)
+	if err != nil {
+		panic(err)
+	}
+	conn.Write(data)
+	//create byte buffer
+	res := make([]byte, 1024)
 
-	dataString := network.listenResponse()
-	pongMessage := strings.Split(dataString, " ")
-	return pongMessage[1]
+	_, err = conn.Read(res)
+	if err != nil {
+		panic(err)
+	}
+	conn.Close()
+	return "pong"
+
 }
 
-func (network *Network) SendPongMessage() {
-	conn := *network.connection
-	hash := network.contact.ID.String()
-	conn.Write([]byte(hash + " pong"))
+func (network *Network) SendPongMessage(message Message, conn net.Conn) {
+	reciever := message.receiver
+	message.receiver = message.sender
+	message.sender = reciever
+	message.ID = messageTypePing
+	message.IsResponse = true
+
+	data := SerializeMessage(&message)
+	conn.Write(data)
 }
 
-// SendFindContactMessage sends a find contact message to the
 func (network *Network) SendFindContactMessage(contact *Contact) {
 	
 }
