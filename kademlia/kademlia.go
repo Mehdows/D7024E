@@ -14,12 +14,13 @@ type Kademlia struct {
 	dictionary   map[string][]byte
 }
 
-func NewKademliaNode(address string, ) (kademlia Kademlia) {
+func NewKademliaNode(address string) (kademlia Kademlia) {
 	KademliaID := NewRandomKademliaID()
 	kademlia.me = NewContact(KademliaID, address)
 	kademlia.routingTable = NewRoutingTable(kademlia.me)
 	kademlia.dictionary = make(map[string][]byte)
 	kademlia.network = &Network{&kademlia}
+	go kademlia.network.Listen()
 	return
 }
 
@@ -47,7 +48,7 @@ func (kademlia *Kademlia) LookupContact(target *Contact) (closestNode *Contact) 
 }
 
 func (kademlia *Kademlia) LookupData(hash string) {
-	// TODO
+
 }
 
 func (kademlia *Kademlia) Store(data []byte) {

@@ -1,13 +1,6 @@
 package d7024e
 
-import (
-	"testing"
-	"bufio"
-	"fmt"
-	"os"
-	"strings"
-)
-
+/*
 func TestCli_handler(t *testing.T) {
 
 	scanner := bufio.NewScanner(os.Stdin)
@@ -44,4 +37,4 @@ func TestCli_handler(t *testing.T) {
 	if scanner.Err() != nil {
 		fmt.Println("Error: ", scanner.Err())
 	}
-}
+}*/

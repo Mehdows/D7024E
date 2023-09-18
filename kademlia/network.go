@@ -4,8 +4,6 @@ import (
 	"net"
 )
 
-
-
 type Network struct {
 	kademlia *Kademlia
 }
@@ -45,6 +43,7 @@ func (network *Network) SendPingMessage(message Message) string {
 	conn, err := net.Dial("tcp", message.receiver.Address)
 	if err != nil {
 		panic(err)
+		//TODO: remove node from routing table?
 	}
 	conn.Write(data)
 	//create byte buffer
