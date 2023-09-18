@@ -45,12 +45,22 @@ func NewPingMessage(sender *Contact, receiver *Contact) Message {
 	}
 }
 
-func NewPongMessage(sender *Contact, receiver *Contact) Message {
+func NewPongMessage(pingMessage Message) Message {
+	return Message{
+		sender:     pingMessage.receiver,
+		receiver:   pingMessage.sender,
+		ID:         messageTypePing,
+		IsResponse: true,
+	}
+}
+
+func NewFindContactMessage(sender *Contact, receiver *Contact, target *KademliaID) Message {
 	return Message{
 		sender:     sender,
 		receiver:   receiver,
-		ID:         messageTypePing,
-		IsResponse: true,
+		ID:         messageTypeFindNode,
+		IsResponse: false,
+		Data:       &findNodeData{target},
 	}
 }
 
