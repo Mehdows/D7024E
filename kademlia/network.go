@@ -70,8 +70,9 @@ func (network *Network) SendPongMessage(message Message, conn net.Conn) {
 	conn.Write(data)
 }
 
-func (network *Network) SendFindContactMessage(contact *Contact) {
-	
+func (network *Network) SendFindContactMessage(contact *Contact, target *KademliaID) []Contact {
+	// TODO
+	return nil
 }
 
 func (network *Network) SendFindDataMessage(hash string) {
