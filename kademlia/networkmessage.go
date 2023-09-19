@@ -54,7 +54,7 @@ func NewPongMessage(pingMessage Message) Message {
 	}
 }
 
-func NewFindContactMessage(sender *Contact, receiver *Contact, target *KademliaID) Message {
+func NewFindNodeMessage(sender *Contact, receiver *Contact, target *KademliaID) Message {
 	return Message{
 		sender:     sender,
 		receiver:   receiver,
@@ -64,6 +64,25 @@ func NewFindContactMessage(sender *Contact, receiver *Contact, target *KademliaI
 	}
 }
 
+func NewFindValueMessage(sender *Contact, receiver *Contact, target *KademliaID) Message {
+	return Message{
+		sender:     sender,
+		receiver:   receiver,
+		ID:         messageTypeFindValue,
+		IsResponse: false,
+		Data:       &findDataData{target},
+	}
+}
+
+func NewStoreMessage(sender *Contact, receiver *Contact, data []byte) Message {
+	return Message{
+		sender:     sender,
+		receiver:   receiver,
+		ID:         messageTypeStore,
+		IsResponse: false,
+		Data:       &storeDataData{data},
+	}
+}
 
 
 // implement serialization with marshal

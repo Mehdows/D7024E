@@ -39,24 +39,11 @@ func (network *Network) handleConnection(conn net.Conn) {
 }
 
 // SendPingMessage sends a ping message to the contact
-<<<<<<< HEAD
 func (network *Network) SendPingMessage(reciever *Contact) string {
 	me := network.kademlia.me
 	message := NewPingMessage(&me, reciever)
 
 	_ = network.dialAndSend(message)
-=======
-func (network *Network) SendPingMessage(message Message) string {
-	data := SerializeMessage(&message)
-	conn, err := net.Dial("tcp", message.receiver.Address)
-	if err != nil {
-		panic(err)
-		//TODO: remove node from routing table?
-	}
-	conn.Write(data)
-	//create byte buffer
-	res := make([]byte, 1024)
->>>>>>> c15d24ec57aef19cdb860c7b78e87e19774bb952
 
 	return "pong"
 
@@ -69,7 +56,7 @@ func (network *Network) SendPongMessage(pingMessage Message, conn net.Conn) {
 }
 
 func (network *Network) SendFindContactMessage(receiver Contact, hashToFind *KademliaID) Message{
-	message := NewFindContactMessage(&network.kademlia.me, &receiver, hashToFind)
+	message := NewFindNodeMessage(&network.kademlia.me, &receiver, hashToFind)
 	reply := network.dialAndSend(message)
 	return reply
 }
