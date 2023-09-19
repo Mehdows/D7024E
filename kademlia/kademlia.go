@@ -19,12 +19,13 @@ type Kademlia struct {
 	dictionary   map[string][]byte
 }
 
-func NewKademliaNode(address string, ) (kademlia Kademlia) {
+func NewKademliaNode(address string) (kademlia Kademlia) {
 	KademliaID := NewRandomKademliaID()
 	kademlia.me = NewContact(KademliaID, address)
 	kademlia.routingTable = NewRoutingTable(kademlia.me)
 	kademlia.dictionary = make(map[string][]byte)
 	kademlia.network = &Network{&kademlia}
+	go kademlia.network.Listen()
 	return
 }
 
@@ -91,7 +92,7 @@ func (kademlia *Kademlia) UpdateShortlist (shortList []Contact, reslist []Contac
 
 
 func (kademlia *Kademlia) LookupData(hash string) {
-	// TODO
+
 }
 
 func (kademlia *Kademlia) Store(data []byte) {
@@ -103,15 +104,13 @@ func (kademlia *Kademlia) Store(data []byte) {
 
 func (Kademlia *Kademlia) Ping(id *KademliaID, address string) {
 	Contact := NewContact(id, address)
-	message := NewPingMessage(&Kademlia.me, &Contact)
-	Kademlia.network.SendPingMessage(message)
+	Kademlia.network.SendPingMessage(&Contact)
 }
 
 func (Kademlia *Kademlia) HandleRequest(conn net.Conn, message Message) {
 	switch message.ID {
 	case messageTypePing:
-		response := NewPongMessage(&Kademlia.me, message.sender)
-		Kademlia.network.SendPongMessage(response, conn)
+		Kademlia.network.SendPongMessage(message, conn)
 	case messageTypeStore:
 		// TODO
 	case messageTypeFindNode:
