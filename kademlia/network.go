@@ -61,12 +61,18 @@ func (network *Network) SendFindContactMessage(receiver Contact, hashToFind *Kad
 	return reply
 }
 
-func (network *Network) SendFindDataMessage(hash string) {
-	// TODO
+// SendFindDataMessage sends a find data message to the closest node to the hash
+// returns the data if found, otherwise the closest contacts
+func (network *Network) SendFindDataMessage(closestNode Contact, hash string) Message{
+	message := NewFindValueMessage(&network.kademlia.me, &closestNode, NewKademliaID(hash))
+	response := network.dialAndSend(message)
+	return response
 }
 
-func (network *Network) SendStoreMessage(data []byte) {
-	// TODO
+// SendStoreMessage sends a store message to the closest node to the hash
+func (network *Network) SendStoreMessage(receiver Contact, data []byte) {
+	message := NewStoreMessage(&network.kademlia.me, &receiver, data)
+	network.dialAndSend(message)
 }
 
 func (network *Network) dialAndSend(message Message) Message{
@@ -75,9 +81,11 @@ func (network *Network) dialAndSend(message Message) Message{
 	if err != nil {
 		panic(err)
 	}
+	defer conn.Close()
 	conn.Write(data)
 	//create byte buffer
 	reply := network.listenForReply(conn)
+	
 	return reply
 }
 
@@ -88,6 +96,5 @@ func (network *Network) listenForReply(conn net.Conn) Message{
 	if err != nil {
 		panic(err)
 	}
-	conn.Close()
 	return DeserializeMessage(res)
 }
