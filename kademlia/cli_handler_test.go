@@ -1,5 +1,6 @@
 package d7024e
 
+<<<<<<< HEAD
 /*
 func TestCli_handler(t *testing.T) {
 
@@ -38,3 +39,5 @@ func TestCli_handler(t *testing.T) {
 		fmt.Println("Error: ", scanner.Err())
 	}
 }*/
+=======
+>>>>>>> 9b744b4530608d6934ce33b6406f64bdad23c259

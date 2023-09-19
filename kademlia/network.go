@@ -96,5 +96,34 @@ func (network *Network) listenForReply(conn net.Conn) Message{
 	if err != nil {
 		panic(err)
 	}
+<<<<<<< HEAD
 	return DeserializeMessage(res)
+=======
+	conn.Close()
+	return "pong"
+
+}
+
+func (network *Network) SendPongMessage(message Message, conn net.Conn) {
+	reciever := message.receiver
+	message.receiver = message.sender
+	message.sender = reciever
+	message.ID = messageTypePing
+	message.IsResponse = true
+
+	data := SerializeMessage(&message)
+	conn.Write(data)
+}
+
+func (network *Network) SendFindContactMessage(contact *Contact) {
+	
+}
+
+func (network *Network) SendFindDataMessage(hash string) {
+	// TODO
+}
+
+func (network *Network) SendStoreMessage(data []byte) {
+	// TODO
+>>>>>>> 9b744b4530608d6934ce33b6406f64bdad23c259
 }
