@@ -29,7 +29,9 @@ type findDataData struct {
 }
 
 type storeDataData struct {
+	Location *KademliaID
 	Data []byte
+	DataLength int
 }
 
 type responseFindNodeData struct {
@@ -74,13 +76,21 @@ func NewFindValueMessage(sender *Contact, receiver *Contact, target *KademliaID)
 	}
 }
 
-func NewStoreMessage(sender *Contact, receiver *Contact, data []byte) Message {
+func NewStoreMessage(sender *Contact, receiver *Contact, data *storeDataData) Message {
 	return Message{
 		sender:     sender,
 		receiver:   receiver,
 		ID:         messageTypeStore,
 		IsResponse: false,
-		Data:       &storeDataData{data},
+		Data:       data,
+	}
+}
+
+func NewStoreData(location *KademliaID, data []byte) storeDataData {
+	return storeDataData{
+		Location: location,
+		Data:     data,
+		DataLength: len(data),
 	}
 }
 

@@ -1,16 +1,17 @@
 package d7024e
 
 import (
-	"crypto/sha1"
-	"encoding/hex"
 	"fmt"
 	"net"
 )
+
+
 
 type Kademlia struct {
 	me           Contact
 	routingTable *RoutingTable
 	network      *Network
+	replicationFactor int
 	dictionary   map[string][]byte
 }
 
@@ -19,6 +20,7 @@ func NewKademliaNode(address string) (kademlia Kademlia) {
 	kademlia.me = NewContact(KademliaID, address)
 	kademlia.routingTable = NewRoutingTable(kademlia.me)
 	kademlia.dictionary = make(map[string][]byte)
+	kademlia.replicationFactor = 1
 	kademlia.network = &Network{&kademlia}
 	go kademlia.network.Listen()
 	return
@@ -48,14 +50,21 @@ func (kademlia *Kademlia) LookupContact(target *Contact) (closestNode *Contact) 
 }
 
 func (kademlia *Kademlia) LookupData(hash string) {
-
+	
 }
 
+
 func (kademlia *Kademlia) Store(data []byte) {
-	sha1 := sha1.Sum([]byte(data))
-	key := hex.EncodeToString(sha1[:])
-	fmt.Println("Stored data with key: ", key)
-	fmt.Println("Stored hash: ", sha1)
+	location := NewKademliaID(string(data))
+	recipitent := kademlia.routingTable.FindClosestContacts(location, kademlia.replicationFactor)
+	for i := 0; i < len(recipitent); i++ {
+		go kademlia.network.SendStoreMessage(recipitent[i], location, data)
+	}
+}
+
+func (kademlia *Kademlia) handleStore(message Message) {
+	data := message.Data.(*storeDataData)
+	kademlia.dictionary[data.Location.String()] = data.Data
 }
 
 func (Kademlia *Kademlia) Ping(id *KademliaID, address string) {
@@ -64,6 +73,7 @@ func (Kademlia *Kademlia) Ping(id *KademliaID, address string) {
 }
 
 func (Kademlia *Kademlia) HandleRequest(conn net.Conn, message Message) {
+	Kademlia.routingTable.AddContact(*message.sender)
 	switch message.ID {
 	case messageTypePing:
 		Kademlia.network.SendPongMessage(message, conn)

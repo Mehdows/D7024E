@@ -2,7 +2,6 @@ package d7024e
 
 import (
 	"net"
-
 )
 
 type Network struct {
@@ -70,8 +69,9 @@ func (network *Network) SendFindDataMessage(closestNode Contact, hash string) Me
 }
 
 // SendStoreMessage sends a store message to the closest node to the hash
-func (network *Network) SendStoreMessage(receiver Contact, data []byte) {
-	message := NewStoreMessage(&network.kademlia.me, &receiver, data)
+func (network *Network) SendStoreMessage(receiver Contact, hash *KademliaID, data []byte) {
+	datastruct := NewStoreData(hash, data)
+	message := NewStoreMessage(&network.kademlia.me, &receiver, &datastruct)
 	network.dialAndSend(message)
 }
 
@@ -96,34 +96,5 @@ func (network *Network) listenForReply(conn net.Conn) Message{
 	if err != nil {
 		panic(err)
 	}
-<<<<<<< HEAD
 	return DeserializeMessage(res)
-=======
-	conn.Close()
-	return "pong"
-
-}
-
-func (network *Network) SendPongMessage(message Message, conn net.Conn) {
-	reciever := message.receiver
-	message.receiver = message.sender
-	message.sender = reciever
-	message.ID = messageTypePing
-	message.IsResponse = true
-
-	data := SerializeMessage(&message)
-	conn.Write(data)
-}
-
-func (network *Network) SendFindContactMessage(contact *Contact) {
-	
-}
-
-func (network *Network) SendFindDataMessage(hash string) {
-	// TODO
-}
-
-func (network *Network) SendStoreMessage(data []byte) {
-	// TODO
->>>>>>> 9b744b4530608d6934ce33b6406f64bdad23c259
 }
