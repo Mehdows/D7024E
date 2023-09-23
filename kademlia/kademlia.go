@@ -14,6 +14,7 @@ type Kademlia struct {
 	routingTable *RoutingTable
 	network      *Network
 	replicationFactor int
+	k 		   		  int
 	dictionary   map[string][]byte
 }
 
@@ -23,9 +24,15 @@ func NewKademliaNode(address string) (kademlia Kademlia) {
 	kademlia.routingTable = NewRoutingTable(kademlia.me)
 	kademlia.dictionary = make(map[string][]byte)
 	kademlia.replicationFactor = 1
+	kademlia.k = 3
 	kademlia.network = &Network{&kademlia}
 	go kademlia.network.Listen()
 	return
+}
+
+func (Kademlia *Kademlia) JoinNetwork(address string, id byte ) {
+	//contact := KademliaID{id,}
+	//Kademlia.lookupContact(look up kademlia.me.ID, send to contact)
 }
 
 func (kademlia *Kademlia) LookupContact(target *Contact) (closestNode *Contact) {
@@ -101,7 +108,7 @@ func (kademlia *Kademlia) handleLookupData(message Message, conn net.Conn) {
 	if kademlia.dictionary[data.Target.String()] != nil {
 		kademlia.network.SendFindDataResponse(message, kademlia.dictionary[data.Target.String()], conn)
 	} else {
-		recipient := kademlia.routingTable.FindClosestContacts(data.Target, 1)
+		recipient := kademlia.routingTable.FindClosestContacts(data.Target, kademlia.k)
 		kademlia.network.SendFindContactResponse(message, recipient, conn)
 	}
 }
