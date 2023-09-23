@@ -28,9 +28,9 @@ func NewKademliaNode(address string) (kademlia Kademlia) {
 	return
 }
 
-func (Kademlia *Kademlia) JoinNetwork(address string) {
-	contact := NewContact(NewRandomKademliaID(), address)
-	Kademlia.network.SendPingMessage(&contact)
+func (Kademlia *Kademlia) JoinNetwork(address string, id byte ) {
+	//contact := KademliaID{id,}
+	//Kademlia.lookupContact(look up kademlia.me.ID, send to contact)
 }
 
 func (kademlia *Kademlia) LookupContact(target *Contact) (closestNode *Contact) {
