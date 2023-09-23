@@ -1,11 +1,13 @@
 package d7024e
 
 import (
-	"fmt"
 	"net"
+	"sync"
 )
 
-
+// Kademlia parameters
+const alpha int = 3
+var wg sync.WaitGroup
 
 type Kademlia struct {
 	me           Contact
@@ -27,27 +29,66 @@ func NewKademliaNode(address string) (kademlia Kademlia) {
 }
 
 func (kademlia *Kademlia) LookupContact(target *Contact) (closestNode *Contact) {
-	// list of k-closest nodes
-	closestK := kademlia.routingTable.FindClosestContacts(target.ID, bucketSize)
+	net := kademlia.network
+	// Create a channel for the responses
+	resCh := make(chan []Contact, alpha)
+	conCh := make(chan Contact, alpha)
 
-	if len(closestK) == 0 {
-		fmt.Println("No contacts found")
-		return
-	}
+	// Create a shortlist for the search
+	shortList := kademlia.routingTable.FindClosestContacts(target.ID, bucketSize)
 
-	closest := closestK[0]
-
-	// find closest node
-	for i := 0; i < len(closestK); i++ {
-		if closestK[i].ID.CalcDistance(target.ID).Less(closest.ID.CalcDistance(target.ID)) {
-			closest = closestK[i]
+	// Send alpha FindContactMessages to alpha contacts in the shortlist
+	if len(shortList) < alpha {
+		for i := 0; i < len(shortList); i++ {
+			wg.Add(1)
+			go AsyncLookup(target.ID, shortList[i], *net, resCh, conCh)
+		}
+	}else {
+		for i := 0; i < alpha; i++ {
+			wg.Add(1)
+			go AsyncLookup(target.ID, shortList[i], *net, resCh, conCh)
 		}
 	}
 
+	// Wait for all the responses to arrive
+	wg.Wait()
+	close(resCh)
+	close(conCh)
+
+	// Create a list of all the responses
+	var responses []Contact
+	for response := range resCh {
+		responses = append(responses, response...)
+	}
+
+	// Create a list of all the contacts
+	var contacts []Contact
+	for contact := range conCh {
+		contacts = append(contacts, contact)
+	}
+
+	// Update the shortlist
+	shortList = UpdateShortlist(shortList, responses, contacts[0])
 	// return closest node
 	return &closest
-
 }
+
+// AsyncLookup sends a FindContactMessage to the receiver and writes the response to a channel.
+func AsyncLookup(targetID KademliaID, receiver Contact, net Network, ch chan []Contact, conCh chan Contact) {
+	defer wg.Done()
+	// Send the message and wait for the response
+	response := net.SendFindContactMessage(targetID, receiver)
+
+	// Write the response to the channel
+	ch <- response
+	conCh <- receiver
+}
+
+// UpdateShortlist updates the shortlist with the responses and the contact.
+func (kademlia *Kademlia) UpdateShortlist (shortList []Contact, reslist []Contact, contact Contact) []Contact {
+	// TODO
+}
+
 
 func (kademlia *Kademlia) LookupData(hash string) {
 	
