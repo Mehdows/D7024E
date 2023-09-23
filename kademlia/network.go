@@ -50,14 +50,18 @@ func (network *Network) SendPingMessage(reciever *Contact) string {
 
 func (network *Network) SendPongMessage(pingMessage Message, conn net.Conn) {
 	response := NewPongMessage(pingMessage)
-	data := SerializeMessage(&response)
-	conn.Write(data)
+	network.responseToConn(response, conn)
 }
 
 func (network *Network) SendFindContactMessage(receiver Contact, hashToFind *KademliaID) Message{
 	message := NewFindNodeMessage(&network.kademlia.me, &receiver, hashToFind)
 	reply := network.dialAndSend(message)
 	return reply
+}
+
+func (network *Network) SendFindContactResponse(message Message, contacts []Contact, conn net.Conn){
+	response := NewFindNodeResponse(&network.kademlia.me, message.sender, contacts)
+	network.responseToConn(response, conn)
 }
 
 // SendFindDataMessage sends a find data message to the closest node to the hash
@@ -73,6 +77,11 @@ func (network *Network) SendStoreMessage(receiver Contact, hash *KademliaID, dat
 	datastruct := NewStoreData(hash, data)
 	message := NewStoreMessage(&network.kademlia.me, &receiver, &datastruct)
 	network.dialAndSend(message)
+}
+
+func (network *Network) SendFindDataResponse(message Message, data []byte, conn net.Conn){
+	response := NewFindValueResponse(&network.kademlia.me, message.sender, data)
+	network.responseToConn(response, conn)
 }
 
 func (network *Network) dialAndSend(message Message) Message{
@@ -97,4 +106,9 @@ func (network *Network) listenForReply(conn net.Conn) Message{
 		panic(err)
 	}
 	return DeserializeMessage(res)
+}
+
+func (network *Network) responseToConn(message Message, conn net.Conn){
+	data := SerializeMessage(&message)
+	conn.Write(data)
 }

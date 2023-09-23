@@ -17,6 +17,7 @@ type Message struct {
 	receiver   *Contact
 	ID         int
 	IsResponse bool
+	Error 	   error
 	Data       interface{}
 }
 
@@ -28,7 +29,7 @@ type findDataData struct {
 	Target *KademliaID
 }
 
-type storeDataData struct {
+type storeData struct {
 	Location *KademliaID
 	Data []byte
 	DataLength int
@@ -66,6 +67,16 @@ func NewFindNodeMessage(sender *Contact, receiver *Contact, target *KademliaID) 
 	}
 }
 
+func NewFindNodeResponse(sender *Contact, receiver *Contact, contacts []Contact) Message {
+	return Message{
+		sender:     sender,
+		receiver:   receiver,
+		ID:         messageTypeFindNode,
+		IsResponse: true,
+		Data:       &responseFindNodeData{contacts},
+	}
+}
+
 func NewFindValueMessage(sender *Contact, receiver *Contact, target *KademliaID) Message {
 	return Message{
 		sender:     sender,
@@ -76,7 +87,17 @@ func NewFindValueMessage(sender *Contact, receiver *Contact, target *KademliaID)
 	}
 }
 
-func NewStoreMessage(sender *Contact, receiver *Contact, data *storeDataData) Message {
+func NewFindValueResponse(sender *Contact, receiver *Contact, data []byte) Message{
+	return Message{
+		sender:     sender,
+		receiver:   receiver,
+		ID:         messageTypeFindValue,
+		IsResponse: true,
+		Data:       data,
+	}
+}
+
+func NewStoreMessage(sender *Contact, receiver *Contact, data *storeData) Message {
 	return Message{
 		sender:     sender,
 		receiver:   receiver,
@@ -86,8 +107,18 @@ func NewStoreMessage(sender *Contact, receiver *Contact, data *storeDataData) Me
 	}
 }
 
-func NewStoreData(location *KademliaID, data []byte) storeDataData {
-	return storeDataData{
+func newStoreResponseMessage(sender *Contact, receiver *Contact, err error) Message{
+	return Message{
+		sender:     sender,
+		receiver:   receiver,
+		ID:         messageTypeStore,
+		IsResponse: true,
+		Error:      err,
+	}
+}
+
+func NewStoreData(location *KademliaID, data []byte) storeData {
+	return storeData{
 		Location: location,
 		Data:     data,
 		DataLength: len(data),
