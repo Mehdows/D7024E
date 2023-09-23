@@ -2,7 +2,6 @@ package d7024e
 
 import (
 	"net"
-
 )
 
 type Network struct {
@@ -70,8 +69,9 @@ func (network *Network) SendFindDataMessage(closestNode Contact, hash string) Me
 }
 
 // SendStoreMessage sends a store message to the closest node to the hash
-func (network *Network) SendStoreMessage(receiver Contact, data []byte) {
-	message := NewStoreMessage(&network.kademlia.me, &receiver, data)
+func (network *Network) SendStoreMessage(receiver Contact, hash *KademliaID, data []byte) {
+	datastruct := NewStoreData(hash, data)
+	message := NewStoreMessage(&network.kademlia.me, &receiver, &datastruct)
 	network.dialAndSend(message)
 }
 
