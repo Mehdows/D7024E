@@ -50,20 +50,31 @@ func (kademlia *Kademlia) LookupContact(target *Contact) (closestNode *Contact) 
 }
 
 func (kademlia *Kademlia) LookupData(hash string) {
-	
+	location := NewKademliaID(hash)
+	recipient := kademlia.routingTable.FindClosestContacts(location, 1)
+	go kademlia.network.SendFindDataMessage(recipient[0], hash)
 }
 
+func (kademlia *Kademlia) handleLookupData(message Message, conn net.Conn) {
+	data := message.Data.(*findDataData)
+	if kademlia.dictionary[data.Target.String()] != nil {
+		kademlia.network.SendFindDataResponse(message, kademlia.dictionary[data.Target.String()], conn)
+	} else {
+		recipient := kademlia.routingTable.FindClosestContacts(data.Target, 1)
+		kademlia.network.SendFindContactResponse(message, recipient, conn)
+	}
+}
 
 func (kademlia *Kademlia) Store(data []byte) {
 	location := NewKademliaID(string(data))
-	recipitent := kademlia.routingTable.FindClosestContacts(location, kademlia.replicationFactor)
-	for i := 0; i < len(recipitent); i++ {
-		go kademlia.network.SendStoreMessage(recipitent[i], location, data)
+	recipient := kademlia.routingTable.FindClosestContacts(location, kademlia.replicationFactor)
+	for i := 0; i < len(recipient); i++ {
+		go kademlia.network.SendStoreMessage(recipient[i], location, data)
 	}
 }
 
 func (kademlia *Kademlia) handleStore(message Message) {
-	data := message.Data.(*storeDataData)
+	data := message.Data.(*storeData)
 	kademlia.dictionary[data.Location.String()] = data.Data
 }
 
@@ -78,10 +89,11 @@ func (Kademlia *Kademlia) HandleRequest(conn net.Conn, message Message) {
 	case messageTypePing:
 		Kademlia.network.SendPongMessage(message, conn)
 	case messageTypeStore:
-		// TODO
+		Kademlia.handleStore(message)
 	case messageTypeFindNode:
 		// TODO
 	case messageTypeFindValue:
+		Kademlia.handleLookupData(message, conn)
 
 	default:
 		panic("Invalid request " + string(rune(message.ID)))
