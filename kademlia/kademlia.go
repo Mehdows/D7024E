@@ -7,15 +7,16 @@ import (
 
 // Kademlia parameters
 const alpha int = 3
+
 var wg sync.WaitGroup
 
 type Kademlia struct {
-	me           Contact
-	routingTable *RoutingTable
-	network      *Network
+	me                Contact
+	routingTable      *RoutingTable
+	network           *Network
 	replicationFactor int
-	k 		   		  int
-	dictionary   map[string][]byte
+	k                 int
+	dictionary        map[string][]byte
 }
 
 func NewKademliaNode(address string) (kademlia Kademlia) {
@@ -30,9 +31,11 @@ func NewKademliaNode(address string) (kademlia Kademlia) {
 	return
 }
 
-func (Kademlia *Kademlia) JoinNetwork(address string, id byte ) {
-	//contact := KademliaID{id,}
-	//Kademlia.lookupContact(look up kademlia.me.ID, send to contact)
+func (Kademlia *Kademlia) JoinNetwork(address string, id byte) {
+	KademliaID := KademliaID{id}
+	contact := NewContact(&KademliaID, address)
+	Kademlia.routingTable.AddContact(contact)
+	Kademlia.LookupContact(&Kademlia.me)
 }
 
 func (kademlia *Kademlia) LookupContact(target *Contact) (closestNode *Contact) {
@@ -50,7 +53,7 @@ func (kademlia *Kademlia) LookupContact(target *Contact) (closestNode *Contact) 
 			wg.Add(1)
 			go AsyncLookup(target.ID, shortList[i], *net, resCh, conCh)
 		}
-	}else {
+	} else {
 		for i := 0; i < alpha; i++ {
 			wg.Add(1)
 			go AsyncLookup(target.ID, shortList[i], *net, resCh, conCh)
@@ -92,10 +95,9 @@ func AsyncLookup(targetID KademliaID, receiver Contact, net Network, ch chan []C
 }
 
 // UpdateShortlist updates the shortlist with the responses and the contact.
-func (kademlia *Kademlia) UpdateShortlist (shortList []Contact, reslist []Contact, contact Contact) []Contact {
+func (kademlia *Kademlia) UpdateShortlist(shortList []Contact, reslist []Contact, contact Contact) []Contact {
 	// TODO
 }
-
 
 func (kademlia *Kademlia) LookupData(hash string) {
 	location := NewKademliaID(hash)
