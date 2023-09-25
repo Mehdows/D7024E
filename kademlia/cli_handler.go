@@ -22,6 +22,8 @@ func Cli_handler() {
 
 		if choice == "get" && len(res) == 2 {
 			fmt.Println("I will get a file with hash: ", res[1])
+			
+			
 
 		} else if choice == "put" {
 			fmt.Println("I will store a file with value: ", res[1:])

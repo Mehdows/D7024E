@@ -39,6 +39,7 @@ func (Kademlia *Kademlia) JoinNetwork(address string, id byte) {
 
 func (kademlia *Kademlia) LookupContact(target *Contact) (closestNode *Contact) {
 	net := kademlia.network
+	previousClosestNode := kademlia.me
 	
 	// Create a shortlist for the search
 	shortList := kademlia.routingTable.FindClosestContacts(target.ID, alpha)
@@ -53,17 +54,18 @@ func (kademlia *Kademlia) LookupContact(target *Contact) (closestNode *Contact) 
 
 	// Find closest to target from shortlist
 	for i := 0; i < len(shortList); i++ {
-		closestNode := &shortList[0]
+		closestNode := shortList[0]
 		if shortList[i].ID.CalcDistance(target.ID).Less(target.ID.CalcDistance(closestNode.ID)) {
-			closestNode = &shortList[i]
+			closestNode = shortList[i]
 		}
 	}
 
 	// If closest node is target, return closest node
-	if closestNode.ID.Equals(target.ID) {
+	if closestNode == &previousClosestNode {
 		return closestNode
 	} else {
 		// Else, repeat the process with the closest node
+		previousClosestNode = *closestNode
 		return kademlia.LookupContact(closestNode)
 	}
 }
