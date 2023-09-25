@@ -10,6 +10,7 @@ import (
 
 func Cli_handler(kademlia *Kademlia) {
 	scanner := bufio.NewScanner(os.Stdin)
+	print(kademlia.me.Address + "> ")
 	for {
 		fmt.Print("Enter Text: ")
 		// reads user input until \n by default

@@ -34,40 +34,41 @@ func (Kademlia *Kademlia) JoinNetwork(address string, id byte) {
 	KademliaID := KademliaID{id}
 	contact := NewContact(&KademliaID, address)
 	Kademlia.routingTable.AddContact(contact)
-	Kademlia.LookupContact(&Kademlia.me)
+	Kademlia.LookupContact(Kademlia.me.ID)
 }
 
-func (kademlia *Kademlia) LookupContact(target *Contact) (closestNode *Contact) {
+func (kademlia *Kademlia) LookupContact(target *KademliaID) (closestNode *Contact) {
 	net := kademlia.network
-	previousClosestNode := kademlia.me
-	
+
 	// Create a shortlist for the search
-	shortList := kademlia.routingTable.FindClosestContacts(target.ID, alpha)
+	shortList := kademlia.routingTable.FindClosestContacts(target, alpha)
+	closest := shortList[0]
+	oldClose := shortList[0]
 
-	// Send alpha FIND_NODE RPCs
-	response := net.SendFindContactMessage(shortList[0], target.ID)
+	for true {
+		// Send alpha FIND_NODE RPCs
+		response := net.SendFindContactMessage(closest, target)
 
-	// Add the contacts from the response to the shortlist
-	for i := 0; i < len(response.Data.(*responseFindNodeData).Contacts); i++ {
-		shortList = append(shortList, response.Data.(*responseFindNodeData).Contacts[i])
-	}
+		// Add the contacts from the response to the shortlist
+		for i := 0; i < len(response.Data.(*responseFindNodeData).Contacts); i++ {
+			shortList = append(shortList, response.Data.(*responseFindNodeData).Contacts[i])
+		}
 
-	// Find closest to target from shortlist
-	for i := 0; i < len(shortList); i++ {
-		closestNode := shortList[0]
-		if shortList[i].ID.CalcDistance(target.ID).Less(target.ID.CalcDistance(closestNode.ID)) {
-			closestNode = shortList[i]
+		// Find closest to target from shortlist
+		for i := 0; i < len(shortList); i++ {
+			if shortList[i].ID.CalcDistance(target).Less(target.CalcDistance(closestNode.ID)) {
+				closest = shortList[i]
+			}
+		}
+
+		// If the closest node is the same as the old closest node, we are done
+		if closest == oldClose {
+			break
+		} else {
+			oldClose = closest
 		}
 	}
-
-	// If closest node is target, return closest node
-	if closestNode == &previousClosestNode {
-		return closestNode
-	} else {
-		// Else, repeat the process with the closest node
-		previousClosestNode = *closestNode
-		return kademlia.LookupContact(closestNode)
-	}
+	return &closest
 }
 
 func (kademlia *Kademlia) handleLookUpContact(message Message, conn net.Conn) {
@@ -78,8 +79,8 @@ func (kademlia *Kademlia) handleLookUpContact(message Message, conn net.Conn) {
 
 func (kademlia *Kademlia) LookupData(hash string) {
 	location := NewKademliaID(hash)
-	recipient := kademlia.routingTable.FindClosestContacts(location, 1)
-	go kademlia.network.SendFindDataMessage(recipient[0], hash)
+	recipient := kademlia.LookupContact(location)
+	go kademlia.network.SendFindDataMessage(*recipient, hash)
 }
 
 func (kademlia *Kademlia) handleLookupData(message Message, conn net.Conn) {
@@ -94,10 +95,8 @@ func (kademlia *Kademlia) handleLookupData(message Message, conn net.Conn) {
 
 func (kademlia *Kademlia) Store(data []byte) {
 	location := NewKademliaID(string(data))
-	recipient := kademlia.routingTable.FindClosestContacts(location, kademlia.replicationFactor)
-	for i := 0; i < len(recipient); i++ {
-		go kademlia.network.SendStoreMessage(recipient[i], location, data)
-	}
+	recipient := kademlia.LookupContact(location)
+	go kademlia.network.SendStoreMessage(*recipient, location, data)
 }
 
 func (kademlia *Kademlia) handleStore(message Message) {
