@@ -10,12 +10,12 @@ const alpha int = 1
 var wg sync.WaitGroup
 
 type Kademlia struct {
-	me           Contact
-	routingTable *RoutingTable
-	network      *Network
+	me                Contact
+	routingTable      *RoutingTable
+	network           *Network
 	replicationFactor int
-	k 		   		  int
-	dictionary   map[string][]byte
+	k                 int
+	dictionary        map[string][]byte
 }
 
 func NewKademliaNode(address string) (kademlia Kademlia) {
@@ -30,9 +30,11 @@ func NewKademliaNode(address string) (kademlia Kademlia) {
 	return
 }
 
-func (Kademlia *Kademlia) JoinNetwork(address string, id byte ) {
-	//contact := KademliaID{id,}
-	//Kademlia.lookupContact(look up kademlia.me.ID, send to contact)
+func (Kademlia *Kademlia) JoinNetwork(address string, id byte) {
+	KademliaID := KademliaID{id}
+	contact := NewContact(&KademliaID, address)
+	Kademlia.routingTable.AddContact(contact)
+	Kademlia.LookupContact(&Kademlia.me)
 }
 
 func (kademlia *Kademlia) LookupContact(target *Contact) (closestNode *Contact) {
@@ -71,7 +73,6 @@ func (kademlia *Kademlia) handleLookUpContact(message Message, conn net.Conn) {
 	recipient := kademlia.routingTable.FindClosestContacts(data.Target, kademlia.k)
 	kademlia.network.SendFindContactResponse(message, recipient, conn)
 }
-
 
 func (kademlia *Kademlia) LookupData(hash string) {
 	location := NewKademliaID(hash)
