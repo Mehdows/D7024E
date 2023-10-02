@@ -6,7 +6,7 @@ import (
 )
 
 // Kademlia parameters
-const alpha int = 3
+const alpha int = 1
 
 var wg sync.WaitGroup
 
@@ -25,7 +25,7 @@ func NewKademliaNode(address string) (kademlia Kademlia) {
 	kademlia.routingTable = NewRoutingTable(kademlia.me)
 	kademlia.dictionary = make(map[string][]byte)
 	kademlia.replicationFactor = 1
-	kademlia.k = 3
+	kademlia.k = 1
 	kademlia.network = &Network{&kademlia}
 	go kademlia.network.Listen()
 	return
@@ -35,76 +35,53 @@ func (Kademlia *Kademlia) JoinNetwork(address string, id byte) {
 	KademliaID := KademliaID{id}
 	contact := NewContact(&KademliaID, address)
 	Kademlia.routingTable.AddContact(contact)
-	Kademlia.LookupContact(&Kademlia.me)
+	Kademlia.LookupContact(Kademlia.me.ID)
 }
 
-func (kademlia *Kademlia) LookupContact(target *Contact) (closestNode *Contact) {
-	/*net := kademlia.network
-	// Create a channel for the responses
-	resCh := make(chan []Contact, alpha)
-	conCh := make(chan Contact, alpha)
+func (kademlia *Kademlia) LookupContact(target *KademliaID) (closestNode *Contact) {
+	net := kademlia.network
 
 	// Create a shortlist for the search
-	shortList := kademlia.routingTable.FindClosestContacts(target.ID, bucketSize)
+	shortList := kademlia.routingTable.FindClosestContacts(target, alpha)
+	closest := shortList[0]
+	oldClose := shortList[0]
 
-	// Send alpha FindContactMessages to alpha contacts in the shortlist
-	if len(shortList) < alpha {
+	for true {
+		// Send alpha FIND_NODE RPCs
+		response := net.SendFindContactMessage(&closest, target)
+
+		// Add the contacts from the response to the shortlist
+		for i := 0; i < len(response.Data.(*responseFindNodeData).Contacts); i++ {
+			shortList = append(shortList, response.Data.(*responseFindNodeData).Contacts[i])
+		}
+
+		// Find closest to target from shortlist
 		for i := 0; i < len(shortList); i++ {
-			wg.Add(1)
-			go AsyncLookup(target.ID, shortList[i], *net, resCh, conCh)
+			if shortList[i].ID.CalcDistance(target).Less(target.CalcDistance(closestNode.ID)) {
+				closest = shortList[i]
+			}
 		}
-	} else {
-		for i := 0; i < alpha; i++ {
-			wg.Add(1)
-			go AsyncLookup(target.ID, shortList[i], *net, resCh, conCh)
+
+		// If the closest node is the same as the old closest node, we are done
+		if closest == oldClose {
+			break
+		} else {
+			oldClose = closest
 		}
 	}
-
-	// Wait for all the responses to arrive
-	wg.Wait()
-	close(resCh)
-	close(conCh)
-
-	// Create a list of all the responses
-	var responses []Contact
-	for response := range resCh {
-		responses = append(responses, response...)
-	}
-
-	// Create a list of all the contacts
-	var contacts []Contact
-	for contact := range conCh {
-		contacts = append(contacts, contact)
-	}
-
-	// Update the shortlist
-	shortList = UpdateShortlist(shortList, responses, contacts[0])
-	// return closest node
-	return &closest*/
-	return
+	return &closest
 }
 
-// AsyncLookup sends a FindContactMessage to the receiver and writes the response to a channel.
-func AsyncLookup(targetID KademliaID, receiver Contact, net Network, ch chan []Contact, conCh chan Contact) {
-	/*defer wg.Done()
-	// Send the message and wait for the response
-	response := net.SendFindContactMessage(targetID, receiver)
-
-	// Write the response to the channel
-	ch <- response
-	conCh <- receiver*/
+func (kademlia *Kademlia) handleLookUpContact(message Message, conn net.Conn) {
+	data := message.Data.(*findNodeData)
+	recipient := kademlia.routingTable.FindClosestContacts(&data.Target, kademlia.k)
+	kademlia.network.SendFindContactResponse(message, recipient, conn)
 }
 
-// UpdateShortlist updates the shortlist with the responses and the contact.
-/*func (kademlia *Kademlia) UpdateShortlist(shortList []Contact, reslist []Contact, contact Contact) []Contact {
-	// TODO
-	return []Contact{}
-}
-*/
 func (kademlia *Kademlia) LookupData(hash string) {
 	location := NewKademliaID(hash)
-	recipient := kademlia.routingTable.FindClosestContacts(location, 1)
-	go kademlia.network.SendFindDataMessage(recipient[0], hash)
+	recipient := kademlia.LookupContact(location)
+	go kademlia.network.SendFindDataMessage(*recipient, hash)
 }
 
 func (kademlia *Kademlia) handleLookupData(message Message, conn net.Conn) {
@@ -119,10 +96,8 @@ func (kademlia *Kademlia) handleLookupData(message Message, conn net.Conn) {
 
 func (kademlia *Kademlia) Store(data []byte) {
 	location := NewKademliaID(string(data))
-	recipient := kademlia.routingTable.FindClosestContacts(location, kademlia.replicationFactor)
-	for i := 0; i < len(recipient); i++ {
-		go kademlia.network.SendStoreMessage(recipient[i], location, data)
-	}
+	recipient := kademlia.LookupContact(location)
+	go kademlia.network.SendStoreMessage(*recipient, location, data)
 }
 
 func (kademlia *Kademlia) handleStore(message Message) {
@@ -143,7 +118,7 @@ func (Kademlia *Kademlia) HandleRequest(conn net.Conn, message Message) {
 	case messageTypeStore:
 		Kademlia.handleStore(message)
 	case messageTypeFindNode:
-		// TODO
+		Kademlia.handleLookUpContact(message, conn)
 	case messageTypeFindValue:
 		Kademlia.handleLookupData(message, conn)
 
