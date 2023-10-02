@@ -39,7 +39,7 @@ func (Kademlia *Kademlia) JoinNetwork(address string, id byte) {
 }
 
 func (kademlia *Kademlia) LookupContact(target *Contact) (closestNode *Contact) {
-	net := kademlia.network
+	/*net := kademlia.network
 	// Create a channel for the responses
 	resCh := make(chan []Contact, alpha)
 	conCh := make(chan Contact, alpha)
@@ -80,25 +80,27 @@ func (kademlia *Kademlia) LookupContact(target *Contact) (closestNode *Contact) 
 	// Update the shortlist
 	shortList = UpdateShortlist(shortList, responses, contacts[0])
 	// return closest node
-	return &closest
+	return &closest*/
+	return
 }
 
 // AsyncLookup sends a FindContactMessage to the receiver and writes the response to a channel.
 func AsyncLookup(targetID KademliaID, receiver Contact, net Network, ch chan []Contact, conCh chan Contact) {
-	defer wg.Done()
+	/*defer wg.Done()
 	// Send the message and wait for the response
 	response := net.SendFindContactMessage(targetID, receiver)
 
 	// Write the response to the channel
 	ch <- response
-	conCh <- receiver
+	conCh <- receiver*/
 }
 
 // UpdateShortlist updates the shortlist with the responses and the contact.
-func (kademlia *Kademlia) UpdateShortlist(shortList []Contact, reslist []Contact, contact Contact) []Contact {
+/*func (kademlia *Kademlia) UpdateShortlist(shortList []Contact, reslist []Contact, contact Contact) []Contact {
 	// TODO
+	return []Contact{}
 }
-
+*/
 func (kademlia *Kademlia) LookupData(hash string) {
 	location := NewKademliaID(hash)
 	recipient := kademlia.routingTable.FindClosestContacts(location, 1)
@@ -106,11 +108,11 @@ func (kademlia *Kademlia) LookupData(hash string) {
 }
 
 func (kademlia *Kademlia) handleLookupData(message Message, conn net.Conn) {
-	data := message.Data.(*findDataData)
+	data := message.Data.(*findData)
 	if kademlia.dictionary[data.Target.String()] != nil {
 		kademlia.network.SendFindDataResponse(message, kademlia.dictionary[data.Target.String()], conn)
 	} else {
-		recipient := kademlia.routingTable.FindClosestContacts(data.Target, kademlia.k)
+		recipient := kademlia.routingTable.FindClosestContacts(&data.Target, kademlia.k)
 		kademlia.network.SendFindContactResponse(message, recipient, conn)
 	}
 }
@@ -134,7 +136,7 @@ func (Kademlia *Kademlia) Ping(id *KademliaID, address string) {
 }
 
 func (Kademlia *Kademlia) HandleRequest(conn net.Conn, message Message) {
-	Kademlia.routingTable.AddContact(*message.sender)
+	Kademlia.routingTable.AddContact(message.Sender)
 	switch message.ID {
 	case messageTypePing:
 		Kademlia.network.SendPongMessage(message, conn)

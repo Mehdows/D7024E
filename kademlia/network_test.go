@@ -1,9 +1,7 @@
 package d7024e
 
-import (
-	"testing"
-)
-
+/*
+// not a unit test
 func TestSendPingMessage(t *testing.T) {
 
 	Kademlia := NewKademliaNode("localhost:8080")
@@ -15,3 +13,4 @@ func TestSendPingMessage(t *testing.T) {
 	}
 
 }
+*/

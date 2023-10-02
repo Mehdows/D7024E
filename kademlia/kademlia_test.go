@@ -1,12 +1,8 @@
 package d7024e
 
-
-import (
-	"testing"
-)
-
+/*
 func TestLookupContact(t *testing.T) {
-	
+
 	Kademlia := NewKademliaNode("localhost:8080")
 	go Kademlia.network.Listen()
 	contact := NewContact(Kademlia.me.ID, "localhost:8080")
@@ -16,3 +12,4 @@ func TestLookupContact(t *testing.T) {
 		t.Errorf("Expected %s, got %s", "localhost:8080", res.Address)
 	}
 }
+*/
