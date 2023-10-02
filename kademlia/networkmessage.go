@@ -3,9 +3,6 @@ package d7024e
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
-	"fmt"
-	"reflect"
 )
 
 const (
@@ -16,30 +13,30 @@ const (
 )
 
 type Message struct {
-	Sender     Contact     `json:"sender"`
-	Receiver   Contact     `json:"receiver"`
-	ID         int         `json:"id"`
-	IsResponse bool        `json:"isResponse"`
-	Error      error       `json:"error"`
-	Data       interface{} `json:"data"`
+	Sender     Contact     `json:"Sender"`
+	Receiver   Contact     `json:"Receiver"`
+	ID         int         `json:"ID"`
+	IsResponse bool        `json:"IsResponse"`
+	Error      error       `json:"Error"`
+	Data       interface{} `json:"Data"`
 }
 
 type findNodeData struct {
-	Target KademliaID `json:"target"`
+	Target KademliaID `json:"Target"`
 }
 
 type findData struct {
-	Target KademliaID `json:"target"`
+	Target KademliaID `json:"Target"`
 }
 
 type storeData struct {
-	Location   KademliaID `json:"location"`
-	Data       []byte     `json:"data"`
-	DataLength int        `json:"dataLength"`
+	Location   KademliaID `json:"Location"`
+	Data       []byte     `json:"Data"`
+	DataLength int        `json:"DataLength"`
 }
 
 type responseFindNodeData struct {
-	Contacts []Contact `json:"contacts"`
+	Contacts []Contact `json:"Contacts"`
 }
 
 func NewPingMessage(Sender Contact, Receiver Contact) Message {
@@ -147,36 +144,22 @@ func DeserializeMessage(data []byte, message *Message) {
 	if err != nil {
 		panic(err)
 	}
+	deserializeDataField(data, message)
 }
 
-func (s *storeData) FillStruct(m map[string]interface{}) error {
-	for k, v := range m {
-		err := SetField(s, k, v)
-		if err != nil {
-			return err
-		}
+func deserializeDataField(data []byte, message *Message) {
+	var datastruct interface{}
+	switch message.ID {
+	case messageTypeFindNode:
+		datastruct = new(findNodeData)
+	case messageTypeFindValue:
+		datastruct = new(findData)
+	case messageTypeStore:
+		datastruct = new(storeData)
 	}
-	return nil
-}
-
-func SetField(obj interface{}, name string, value interface{}) error {
-	structValue := reflect.ValueOf(obj).Elem()
-	structFieldValue := structValue.FieldByName(name)
-
-	if !structFieldValue.IsValid() {
-		return fmt.Errorf("No such field: %s in obj", name)
+	message.Data = datastruct
+	err := json.Unmarshal(data, message)
+	if err != nil {
+		panic(err)
 	}
-
-	if !structFieldValue.CanSet() {
-		return fmt.Errorf("Cannot set %s field value", name)
-	}
-
-	structFieldType := structFieldValue.Type()
-	val := reflect.ValueOf(value)
-	if structFieldType != val.Type() {
-		return errors.New("Provided value type didn't match obj field type")
-	}
-
-	structFieldValue.Set(val)
-	return nil
 }

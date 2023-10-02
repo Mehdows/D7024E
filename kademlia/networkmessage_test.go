@@ -98,8 +98,8 @@ func TestNewFindValueMessage(t *testing.T) {
 	if message.IsResponse != false {
 		t.Errorf("NewFindValueMessage() = %t; want %t", message.IsResponse, false)
 	}
-	if message.Data.(*findData).Target != *target {
-		t.Errorf("NewFindValueMessage() = %s; want %s", message.Data.(*findData).Target, target)
+	if message.Data.(findData).Target != *target {
+		t.Errorf("NewFindValueMessage() = %s; want %s", message.Data.(findData).Target, target)
 	}
 }
 
@@ -141,10 +141,10 @@ func TestNewStoreMessage(t *testing.T) {
 	if message.IsResponse != false {
 		t.Errorf("NewStoreMessage() = %t; want %t", message.IsResponse, false)
 	}
-	if message.Data.(*storeData).Location != *id {
+	if message.Data.(storeData).Location != *id {
 		t.Errorf("NewStoreMessage() = %s; want %s", message.Data.(*storeData).Location, id)
 	}
-	if string(message.Data.(*storeData).Data) != string(data.Data) {
+	if string(message.Data.(storeData).Data) != string(data.Data) {
 		t.Errorf("NewStoreMessage() = %s; want %s", string(message.Data.(*storeData).Data), string(data.Data))
 	}
 }
@@ -191,9 +191,7 @@ func TestSerializeMessage(t *testing.T) {
 	message := NewStoreMessage(contact, contact, data)
 	serialized := SerializeMessage(&message)
 	DeserializeMessage(serialized, &deserialized)
-	var stData storeData
-	stData.FillStruct(deserialized.Data.(map[string]interface{}))
-	deserialized.Data = stData
+
 
 	if deserialized.Sender.String() != message.Sender.String() {
 		t.Errorf("SerializeMessage() = %s; want %s", deserialized.Sender.String(), message.Sender.String())
@@ -207,13 +205,13 @@ func TestSerializeMessage(t *testing.T) {
 	if deserialized.IsResponse != message.IsResponse {
 		t.Errorf("SerializeMessage() = %t; want %t", deserialized.IsResponse, message.IsResponse)
 	}
-	if deserialized.Data.(storeData).Location != message.Data.(storeData).Location {
-		t.Errorf("SerializeMessage() = %s; want %s", deserialized.Data.(storeData).Location, message.Data.(storeData).Location)
+	if deserialized.Data.(*storeData).Location != message.Data.(storeData).Location {
+		t.Errorf("SerializeMessage() = %s; want %s", deserialized.Data.(*storeData).Location, message.Data.(storeData).Location)
 	}
-	if string(deserialized.Data.(storeData).Data) != string(message.Data.(storeData).Data) {
-		t.Errorf("SerializeMessage() = %s; want %s", string(deserialized.Data.(storeData).Data), string(message.Data.(storeData).Data))
+	if string(deserialized.Data.(*storeData).Data) != string(message.Data.(storeData).Data) {
+		t.Errorf("SerializeMessage() = %s; want %s", string(deserialized.Data.(*storeData).Data), string(message.Data.(storeData).Data))
 	}
-	if deserialized.Data.(storeData).DataLength != message.Data.(storeData).DataLength {
-		t.Errorf("SerializeMessage() = %d; want %d", deserialized.Data.(storeData).DataLength, message.Data.(storeData).DataLength)
+	if deserialized.Data.(*storeData).DataLength != message.Data.(storeData).DataLength {
+		t.Errorf("SerializeMessage() = %d; want %d", deserialized.Data.(*storeData).DataLength, message.Data.(storeData).DataLength)
 	}
 }
