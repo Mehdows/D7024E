@@ -1,5 +1,6 @@
 FROM golang:latest
 
+
 RUN apt-get update && apt-get install inetutils-ping -y
 
 RUN mkdir /build
@@ -14,7 +15,7 @@ RUN cd /build/D7024E/ && go build -o main .
 
 
 WORKDIR /build/D7024E/
-EXPOSE 8080
+EXPOSE 80
 
 ENTRYPOINT [ "/build/D7024E/main" ]
 
