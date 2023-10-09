@@ -8,5 +8,5 @@ import (
 func main () {
 	fmt.Println("Hello world!")
 	Kademlia := NewKademliaNode("localhost:8080")
-	Cli_handler(&Kademlia)
+	kademlia.Cli_handler(&Kademlia)
 }
