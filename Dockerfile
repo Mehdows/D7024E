@@ -10,13 +10,13 @@ RUN export GO111MODULE=on
 RUN cd /build && git clone https://github.com/Mehdows/D7024E.git
 RUN cd /build/D7024E/ && git pull
 
-RUN cd /build/D7024E/test/GOWEBAPI && go build -o main .
+RUN cd /build/D7024E/ && go build -o main .
 
 
-WORKDIR /build/D7024E/sprint0/GOWEBAPI
+WORKDIR /build/D7024E/
 EXPOSE 8080
 
-ENTRYPOINT [ "/build/D7024E/sprint0/GOWEBAPI/main" ]
+ENTRYPOINT [ "/build/D7024E/main" ]
 
 # Add the commands needed to put your compiled go binary in the container and
 # run it when the container starts.

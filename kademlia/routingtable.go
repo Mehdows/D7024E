@@ -2,7 +2,6 @@ package d7024e
 
 const bucketSize = 20
 
-
 // RoutingTable definition
 // keeps a refrence contact of me and an array of buckets
 type RoutingTable struct {
@@ -67,13 +66,4 @@ func (routingTable *RoutingTable) getBucketIndex(id *KademliaID) int {
 	}
 
 	return IDLength*8 - 1
-}
-
-
-func UpdateShortlist(shortList []Contact, reslist []Contact, contact Contact) []Contact {
-	for _, res := range reslist {
-		shortList = append(shortList, res)
-	}
-	shortList = append(shortList, contact)
-	return shortList
 }

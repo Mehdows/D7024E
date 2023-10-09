@@ -2,14 +2,14 @@
 
 docker build . -t kadlab
 
-for /l %%x in (1, 1 , 20) do (
+for /l %%x in (1, 1 , 3) do (
     if %%x LSS 10 (docker run -d --name web0%%x -p 800%%x:80 kadlab) else (docker run -d --name web%%x -p 80%%x:80 kadlab)
 )
 
 docker ps
 docker network create myNetwork
 
-for /l %%x in (1, 1 , 20) do (
+for /l %%x in (1, 1 , 3) do (
     if %%x LSS 10 (docker network connect myNetwork web0%%x) else (docker network connect myNetwork web%%x)
 )
 
