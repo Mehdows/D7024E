@@ -13,7 +13,6 @@ for /l %%x in (1, 1 , 3) do (
     if %%x LSS 10 (docker network connect myNetwork web0%%x) else (docker network connect myNetwork web%%x)
 )
 
-docker network inspect myNetwork
 docker exec -it web01 /bin/bash 
 
 
