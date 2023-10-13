@@ -1,14 +1,13 @@
 package kademlia
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
 	"net"
-	"sync"
 )
 
 // Kademlia parameters
 const alpha int = 1
-
-var wg sync.WaitGroup
 
 type Kademlia struct {
 	me                Contact
@@ -43,6 +42,11 @@ func (kademlia *Kademlia) LookupContact(target *KademliaID) (closestNode *Contac
 
 	// Create a shortlist for the search
 	shortList := kademlia.routingTable.FindClosestContacts(target, alpha)
+
+	if len(shortList) == 0 {
+		return &kademlia.me
+	}
+
 	closest := shortList[0]
 	oldClose := shortList[0]
 
@@ -95,7 +99,9 @@ func (kademlia *Kademlia) handleLookupData(message Message, conn net.Conn) {
 }
 
 func (kademlia *Kademlia) Store(data []byte) {
-	location := NewKademliaID(string(data))
+	sha1 := sha1.Sum(data)
+	key := hex.EncodeToString(sha1[:])
+	location := NewKademliaID(key)
 	recipient := kademlia.LookupContact(location)
 	go kademlia.network.SendStoreMessage(*recipient, location, data)
 }

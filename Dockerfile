@@ -17,7 +17,7 @@ RUN cd /build/D7024E/ && go build -o main .
 WORKDIR /build/D7024E/
 EXPOSE 80
 
-ENTRYPOINT [ "/build/D7024E/main" ]
+#ENTRYPOINT [ "/build/D7024E/main" ]
 
 # Add the commands needed to put your compiled go binary in the container and
 # run it when the container starts.

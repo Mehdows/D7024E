@@ -7,11 +7,18 @@ import (
 	"strings"
 )
 
-
 func Cli_handler(kademlia *Kademlia) {
 	scanner := bufio.NewScanner(os.Stdin)
 	print(kademlia.me.Address + "> ")
 	for {
+		//print bucket content
+		for i := 0; i < IDLength*8; i++ {
+			if kademlia.routingTable.buckets[i].list.Len() == 0 {
+				continue
+			}
+			fmt.Println("Bucket ", i, ": ", kademlia.routingTable.buckets[i].list)
+		}
+
 		fmt.Print("Enter Text: ")
 		// reads user input until \n by default
 		scanner.Scan()
@@ -26,7 +33,7 @@ func Cli_handler(kademlia *Kademlia) {
 			fmt.Println("I will get a file with hash: ", res[1])
 			kademlia.LookupData(res[1])
 
-		// If the user wants to store a file write its value
+			// If the user wants to store a file write its value
 		} else if choice == "put" {
 			fmt.Println("I will store a file with value: ", res[1:])
 			newres := strings.Join(res[1:], " ")
