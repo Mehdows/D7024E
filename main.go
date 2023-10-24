@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/Mehdows/D7024E/kademlia"
 )
@@ -18,7 +19,9 @@ const BOOTSTRAP_ID = "0000000000000000000000000000000000000000"
 func main() {
 	ip, _ := getMyIP()
 	Kademlia := kademlia.NewKademliaNode(ip)
-	fmt.Print(!isBootstrap())
+
+	time.Sleep(5 * time.Second)
+	fmt.Print(!isBootstrap(), "hello")
 	if !isBootstrap() {
 		fmt.Println("Joining network")
 		Kademlia.JoinNetwork(BOOTSTRAP_IP, BOOTSTRAP_ID)
