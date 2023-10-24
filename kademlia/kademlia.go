@@ -42,11 +42,7 @@ func (kademlia *Kademlia) LookupContact(target *KademliaID) (closestNode *Contac
 
 	// Create a shortlist for the search
 	shortList := kademlia.routingTable.FindClosestContacts(target, alpha)
-
-	if len(shortList) == 0 {
-		return &kademlia.me
-	}
-
+	println(shortList)
 	closest := shortList[0]
 	oldClose := shortList[0]
 
@@ -98,12 +94,13 @@ func (kademlia *Kademlia) handleLookupData(message Message, conn net.Conn) {
 	}
 }
 
-func (kademlia *Kademlia) Store(data []byte) {
-	sha1 := sha1.Sum(data)
+func (kademlia *Kademlia) Store(data string) {
+	sha1 := sha1.Sum([]byte(data))
 	key := hex.EncodeToString(sha1[:])
+
 	location := NewKademliaID(key)
 	recipient := kademlia.LookupContact(location)
-	go kademlia.network.SendStoreMessage(*recipient, location, data)
+	go kademlia.network.SendStoreMessage(*recipient, location, []byte(data))
 }
 
 func (kademlia *Kademlia) handleStore(message Message) {

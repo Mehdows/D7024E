@@ -38,8 +38,7 @@ func Cli_handler(kademlia *Kademlia) {
 		} else if choice == "put" {
 			fmt.Println("I will store a file with value: ", res[1:])
 			newres := strings.Join(res[1:], " ")
-			bytearr := []byte(newres)
-			kademlia.Store(bytearr)
+			kademlia.Store(newres)
 
 		} else if choice == "exit" {
 			fmt.Println("Exiting...")
