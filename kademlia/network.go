@@ -1,6 +1,7 @@
 package kademlia
 
 import (
+	"fmt"
 	"net"
 )
 
@@ -11,6 +12,7 @@ type Network struct {
 func (network *Network) Listen() {
 	for {
 		address := network.kademlia.me.Address
+		fmt.Println("Listening on: ", address)
 		ln, err := net.Listen("tcp", address)
 		if err != nil {
 			panic(err)
