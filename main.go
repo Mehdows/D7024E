@@ -19,6 +19,7 @@ func main() {
 	ip, _ := getMyIP()
 	var Kademlia kademlia.Kademlia
 
+	fmt.Println("My IP is: ", ip)
 	if !isBootstrap() {
 		Kademlia = kademlia.NewRandomKademliaNode(ip + ":80")
 		fmt.Println("Joining network")

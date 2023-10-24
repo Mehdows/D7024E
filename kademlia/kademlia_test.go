@@ -2,10 +2,9 @@ package kademlia
 
 import "testing"
 
-
 func TestNewKademliaNode(t *testing.T) {
 	address := "localhost:8000"
-	kademlia := NewKademliaNode(address)
+	kademlia := NewRandomKademliaNode(address)
 
 	// Check that the Kademlia node was created with the correct address
 	if kademlia.me.Address != address {
@@ -27,4 +26,3 @@ func TestNewKademliaNode(t *testing.T) {
 		t.Errorf("Expected k value 1, but got %d", kademlia.k)
 	}
 }
-
