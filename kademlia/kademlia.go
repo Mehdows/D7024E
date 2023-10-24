@@ -101,8 +101,8 @@ func (kademlia *Kademlia) handleLookupData(message Message, conn net.Conn) {
 	}
 }
 
-func (kademlia *Kademlia) Store(data string) {
-	sha1 := sha1.Sum([]byte(data))
+func (kademlia *Kademlia) Store(data []byte) {
+	sha1 := sha1.Sum(data)
 	key := hex.EncodeToString(sha1[:])
 
 	location := NewKademliaID(key)
