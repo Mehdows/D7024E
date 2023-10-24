@@ -18,9 +18,23 @@ type Kademlia struct {
 	dictionary        map[string][]byte
 }
 
-func NewKademliaNode(address string) (kademlia Kademlia) {
-	KademliaID := NewRandomKademliaID()
-	kademlia.me = NewContact(KademliaID, address)
+func NewKademliaNode(address string, me string) (kademlia Kademlia) {
+	sha1 := sha1.Sum([]byte(me))
+	key := hex.EncodeToString(sha1[:])
+	id := NewKademliaID(key)
+	kademlia.me = NewContact(id, address)
+	kademlia.routingTable = NewRoutingTable(kademlia.me)
+	kademlia.dictionary = make(map[string][]byte)
+	kademlia.replicationFactor = 1
+	kademlia.k = 1
+	kademlia.network = &Network{&kademlia}
+	go kademlia.network.Listen()
+	return
+}
+
+func NewRandomKademliaNode(address string) (kademlia Kademlia) {
+	id := NewRandomKademliaID()
+	kademlia.me = NewContact(id, address)
 	kademlia.routingTable = NewRoutingTable(kademlia.me)
 	kademlia.dictionary = make(map[string][]byte)
 	kademlia.replicationFactor = 1

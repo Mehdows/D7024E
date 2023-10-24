@@ -22,4 +22,6 @@ RUN cd D7024E && git pull
 
 RUN cd D7024E && go build -o main .
 
+EXPOSE 8080
+
 ENTRYPOINT [ "D7024E/main" ]
