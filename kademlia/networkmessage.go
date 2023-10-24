@@ -153,7 +153,11 @@ func deserializeDataField(data []byte, message *Message) {
 	case messageTypeFindNode:
 		datastruct = new(findNodeData)
 	case messageTypeFindValue:
-		datastruct = new(findData)
+		if message.IsResponse {
+			datastruct = new(responseFindNodeData)
+		} else {
+			datastruct = new(findData)
+		}
 	case messageTypeStore:
 		datastruct = new(storeData)
 	}
