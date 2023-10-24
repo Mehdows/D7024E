@@ -4,6 +4,7 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"net"
+	"fmt"
 )
 
 // Kademlia parameters
@@ -58,8 +59,9 @@ func (kademlia *Kademlia) LookupContact(target *KademliaID) (closestNode *Contac
 	net := kademlia.network
 
 	// Create a shortlist for the search
+	fmt.Println("BEFORE")
 	shortList := kademlia.routingTable.FindClosestContacts(target, alpha)
-	println(shortList)
+	fmt.Println(shortList, "shortlist!!!!!!!!!!!!!!!!")
 	closest := shortList[0]
 	oldClose := shortList[0]
 
