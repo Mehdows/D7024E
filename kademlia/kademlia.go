@@ -3,7 +3,6 @@ package kademlia
 import (
 	"crypto/sha1"
 	"encoding/hex"
-	"fmt"
 	"net"
 )
 
