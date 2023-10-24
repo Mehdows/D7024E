@@ -18,6 +18,7 @@ RUN cd /app
 
 RUN apt-get update 
 RUN git clone https://github.com/Mehdows/D7024E.git
+RUN cd D7024E && git pull
 
 RUN cd D7024E && go build -o main .
 

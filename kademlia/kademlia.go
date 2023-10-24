@@ -30,9 +30,12 @@ func NewKademliaNode(address string) (kademlia Kademlia) {
 	return
 }
 
-func (Kademlia *Kademlia) JoinNetwork(address string, id byte) {
-	KademliaID := KademliaID{id}
-	contact := NewContact(&KademliaID, address)
+func (Kademlia *Kademlia) JoinNetwork(address string, id string) {
+	sha1 := sha1.Sum([]byte(id))
+	key := hex.EncodeToString(sha1[:])
+
+	KademliaID := NewKademliaID(key)
+	contact := NewContact(KademliaID, address)
 	Kademlia.routingTable.AddContact(contact)
 	Kademlia.LookupContact(Kademlia.me.ID)
 }
