@@ -3,8 +3,8 @@ package kademlia
 import (
 	"crypto/sha1"
 	"encoding/hex"
-	"net"
 	"fmt"
+	"net"
 )
 
 // Kademlia parameters
@@ -70,10 +70,9 @@ func (kademlia *Kademlia) LookupContact(target *KademliaID) (closestNode *Contac
 		response := net.SendFindContactMessage(&closest, target)
 
 		// Add the contacts from the response to the shortlist
-		for i := 0; i < len(response.Data.(*responseFindNodeData).Contacts); i++ {
-			shortList = append(shortList, response.Data.(*responseFindNodeData).Contacts[i])
-		}
-
+		fmt.Println(shortList, "shortlist1!!!!!!!!!!!!!!!!")
+		shortList = append(shortList, response.Data.(*responseFindNodeData).Contacts...)
+		fmt.Println(shortList, "shortlist2!!!!!!!!!!!!!!!!")
 		// Find closest to target from shortlist
 		for i := 0; i < len(shortList); i++ {
 			if shortList[i].ID.CalcDistance(target).Less(target.CalcDistance(closestNode.ID)) {
