@@ -12,7 +12,7 @@ import (
 )
 
 const IP_PREFIX = ""
-const BOOTSTRAP_IP = "172.18.0.2"
+const BOOTSTRAP_IP = "172.20.0.2"
 const BOOTSTRAP_ID = "0000000000000000000000000000000000000000"
 
 func main() {
