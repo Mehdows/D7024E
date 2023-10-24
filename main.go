@@ -18,7 +18,7 @@ const BOOTSTRAP_ID = "0000000000000000000000000000000000000000"
 
 func main() {
 	ip, _ := getMyIP()
-	Kademlia := kademlia.NewKademliaNode(ip)
+	Kademlia := kademlia.NewKademliaNode(ip + ":80")
 
 	time.Sleep(5 * time.Second)
 	fmt.Print(!isBootstrap(), "hello")
