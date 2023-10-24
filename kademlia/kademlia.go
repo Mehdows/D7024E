@@ -131,7 +131,7 @@ func (Kademlia *Kademlia) Ping(id *KademliaID, address string) {
 }
 
 func (Kademlia *Kademlia) HandleRequest(conn net.Conn, message Message) {
-	Kademlia.routingTable.AddContact(message.Sender)
+	defer Kademlia.routingTable.AddContact(message.Sender)
 	switch message.ID {
 	case messageTypePing:
 		Kademlia.network.SendPongMessage(message, conn)
