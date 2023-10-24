@@ -5,6 +5,6 @@ import (
 )
 
 func main() {
-	Kademlia := kademlia.NewKademliaNode("localhost:8080")
+	Kademlia := kademlia.NewKademliaNode("localhost:80")
 	kademlia.Cli_handler(&Kademlia)
 }
