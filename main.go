@@ -21,10 +21,9 @@ func main() {
 	Kademlia := kademlia.NewKademliaNode(ip + ":80")
 
 	time.Sleep(5 * time.Second)
-	fmt.Print(!isBootstrap(), "hello")
 	if !isBootstrap() {
 		fmt.Println("Joining network")
-		Kademlia.JoinNetwork(BOOTSTRAP_IP, BOOTSTRAP_ID)
+		Kademlia.JoinNetwork(BOOTSTRAP_IP+":80", BOOTSTRAP_ID)
 	}
 
 	kademlia.Cli_handler(&Kademlia)
