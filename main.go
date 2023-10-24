@@ -7,7 +7,6 @@ import (
 	"net"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/Mehdows/D7024E/kademlia"
 )
@@ -19,13 +18,15 @@ const BOOTSTRAP_ID = "0000000000000000000000000000000000000000"
 func main() {
 	fmt.Print("PRIIIIIIIIIIIIIIIIIIIINT")
 	ip, _ := getMyIP()
-	Kademlia := kademlia.NewKademliaNode(ip)
+	var Kademlia kademlia.Kademlia
 
-	time.Sleep(5 * time.Second)
-	fmt.Print(!isBootstrap(), "hello")
 	if !isBootstrap() {
+		Kademlia = kademlia.NewRandomKademliaNode(ip + ":80")
 		fmt.Println("Joining network")
-		Kademlia.JoinNetwork(BOOTSTRAP_IP, BOOTSTRAP_ID)
+		Kademlia.JoinNetwork(BOOTSTRAP_IP+":80", BOOTSTRAP_ID)
+
+	} else {
+		Kademlia = kademlia.NewKademliaNode(ip+":80", BOOTSTRAP_ID)
 	}
 
 	kademlia.Cli_handler(&Kademlia)
