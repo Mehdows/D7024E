@@ -94,16 +94,10 @@ func (kademlia *Kademlia) handleLookupData(message Message, conn net.Conn) {
 	}
 }
 
-<<<<<<< HEAD
 func (kademlia *Kademlia) Store(data string) {
 	sha1 := sha1.Sum([]byte(data))
 	key := hex.EncodeToString(sha1[:])
 
-=======
-func (kademlia *Kademlia) Store(data []byte) {
-	sha1 := sha1.Sum(data)
-	key := hex.EncodeToString(sha1[:])
->>>>>>> 04fb05ad5509181bc3ff9213b7414c40bd9e2d72
 	location := NewKademliaID(key)
 	recipient := kademlia.LookupContact(location)
 	go kademlia.network.SendStoreMessage(*recipient, location, []byte(data))

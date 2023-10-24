@@ -27,7 +27,7 @@ services:
 #      - "4000:80"
     networks:
       - kademlia_network
-      
 networks:
   kademlia_network:
+  driver: bridge
 
