@@ -59,7 +59,6 @@ func (kademlia *Kademlia) LookupContact(target *KademliaID) (closestNode *Contac
 	net := kademlia.network
 
 	// Create a shortlist for the search
-	fmt.Println("BEFORE")
 	shortList := kademlia.routingTable.FindClosestContacts(target, alpha)
 	fmt.Println(shortList, "shortlist!!!!!!!!!!!!!!!!")
 	closest := shortList[0]
