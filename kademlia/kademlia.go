@@ -91,8 +91,8 @@ func (kademlia *Kademlia) LookupContact(target *KademliaID) (closestNode *Contac
 
 func (kademlia *Kademlia) handleLookUpContact(message Message, conn net.Conn) {
 	data := message.Data.(*findNodeData)
-	recipient := kademlia.routingTable.FindClosestContacts(&data.Target, kademlia.k)
-	kademlia.network.SendFindContactResponse(message, recipient, conn)
+	recipients := kademlia.routingTable.FindClosestContacts(&data.Target, kademlia.k)
+	kademlia.network.SendFindContactResponse(message, recipients, conn)
 }
 
 func (kademlia *Kademlia) LookupData(hash string) {

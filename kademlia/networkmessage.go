@@ -63,7 +63,7 @@ func NewFindNodeMessage(Sender Contact, Receiver Contact, target KademliaID) Mes
 		Receiver:   Receiver,
 		ID:         messageTypeFindNode,
 		IsResponse: false,
-		Data:       &findNodeData{target},
+		Data:       findNodeData{target},
 	}
 }
 
@@ -73,7 +73,7 @@ func NewFindNodeResponse(Sender Contact, Receiver Contact, contacts []Contact) M
 		Receiver:   Receiver,
 		ID:         messageTypeFindNode,
 		IsResponse: true,
-		Data:       &responseFindNodeData{contacts},
+		Data:       responseFindNodeData{contacts},
 	}
 }
 
@@ -151,13 +151,13 @@ func deserializeDataField(data []byte, message *Message) {
 	var datastruct interface{}
 	switch message.ID {
 	case messageTypeFindNode:
-		datastruct = new(findNodeData)
-	case messageTypeFindValue:
 		if message.IsResponse {
 			datastruct = new(responseFindNodeData)
 		} else {
-			datastruct = new(findData)
+			datastruct = new(findNodeData)
 		}
+	case messageTypeFindValue:
+		datastruct = new(findData)
 	case messageTypeStore:
 		datastruct = new(storeData)
 	}
