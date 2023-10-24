@@ -10,6 +10,7 @@ import (
 func main() {
 
 	Kademlia := kademlia.NewKademliaNode("localhost:8080")
+
 	if os.Args[1] == "CLI" {
 		kademlia.Cli_handler(&Kademlia)
 	}

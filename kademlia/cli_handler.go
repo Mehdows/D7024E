@@ -9,7 +9,8 @@ import (
 
 func Cli_handler(kademlia *Kademlia) {
 	scanner := bufio.NewScanner(os.Stdin)
-	print(kademlia.me.Address + "> ")
+	fmt.Println(kademlia.me.ID.String() + "> ")
+	fmt.Println(kademlia.me.Address + "> ")
 	for {
 		//print bucket content
 		for i := 0; i < IDLength*8; i++ {
