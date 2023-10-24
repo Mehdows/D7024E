@@ -18,7 +18,9 @@ const BOOTSTRAP_ID = "0000000000000000000000000000000000000000"
 func main() {
 	ip, _ := getMyIP()
 	Kademlia := kademlia.NewKademliaNode(ip)
+	fmt.Print(!isBootstrap())
 	if !isBootstrap() {
+		fmt.Println("Joining network")
 		Kademlia.JoinNetwork(BOOTSTRAP_IP, BOOTSTRAP_ID)
 	}
 
