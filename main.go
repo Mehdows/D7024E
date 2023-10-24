@@ -21,12 +21,12 @@ func main() {
 
 	fmt.Println("My IP is: ", ip)
 	if !isBootstrap() {
-		Kademlia = kademlia.NewRandomKademliaNode(ip + ":80")
+		Kademlia = kademlia.NewRandomKademliaNode(ip + ":8080")
 		fmt.Println("Joining network")
-		Kademlia.JoinNetwork(BOOTSTRAP_IP+":80", BOOTSTRAP_ID)
+		Kademlia.JoinNetwork(BOOTSTRAP_IP+":8080", BOOTSTRAP_ID)
 
 	} else {
-		Kademlia = kademlia.NewKademliaNode(ip+":80", BOOTSTRAP_ID)
+		Kademlia = kademlia.NewKademliaNode(ip+":8080", BOOTSTRAP_ID)
 	}
 
 	kademlia.Cli_handler(&Kademlia)
