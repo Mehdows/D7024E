@@ -10,17 +10,19 @@ type Network struct {
 }
 
 func (network *Network) Listen() {
-	address := network.kademlia.me.Address
-	fmt.Println("Listening on: ", address)
-	ln, err := net.Listen("tcp", address)
-	if err != nil {
-		panic(err)
+	for {
+		address := network.kademlia.me.Address
+		fmt.Println("Listening on: ", address)
+		ln, err := net.Listen("tcp", address)
+		if err != nil {
+			panic(err)
+		}
+		conn, err := ln.Accept()
+		if err != nil {
+			panic(err)
+		}
+		go network.handleConnection(conn)
 	}
-	conn, err := ln.Accept()
-	if err != nil {
-		panic(err)
-	}
-	network.handleConnection(conn)
 
 }
 
