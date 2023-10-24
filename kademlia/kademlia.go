@@ -59,28 +59,18 @@ func (kademlia *Kademlia) LookupContact(target *KademliaID) (closestNode *Contac
 	net := kademlia.network
 
 	// Create a shortlist for the search
-	fmt.Println("BEFORE")
 	shortList := kademlia.routingTable.FindClosestContacts(target, alpha)
-	fmt.Println(shortList, "shortlist!!!!!!!!!!!!!!!!")
+
 	closest := shortList[0]
 	oldClose := shortList[0]
 
 	for true {
 		// Send alpha FIND_NODE RPCs
 		response := net.SendFindContactMessage(&closest, target)
-
-		// Add the contacts from the response to the shortlist
-		fmt.Println(shortList, "shortlist1!!!!!!!!!!!!!!!!")
+		
 		shortList = append(shortList, response.Data.(*responseFindNodeData).Contacts...)
-		fmt.Println(shortList, "shortlist2!!!!!!!!!!!!!!!!")
-		// Find closest to target from shortlist
-		for i := 0; i < len(shortList); i++ {
-			if shortList[i].ID.CalcDistance(target).Less(target.CalcDistance(closestNode.ID)) {
-				closest = shortList[i]
-			}
-		}
-
-		// If the closest node is the same as the old closest node, we are done
+		closest = shortList[len(shortList)-1]
+		
 		if closest == oldClose {
 			break
 		} else {
