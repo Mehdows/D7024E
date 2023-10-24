@@ -1,5 +1,6 @@
 FROM golang:latest
 
+
 RUN apt-get update && apt-get install inetutils-ping -y
 
 RUN mkdir /build

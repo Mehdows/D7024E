@@ -1,6 +1,9 @@
 package main
 
 import (
+	"encoding/hex"
+	"os"
+
 	"github.com/Mehdows/D7024E/kademlia"
 )
 
