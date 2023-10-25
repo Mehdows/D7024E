@@ -95,6 +95,9 @@ func (kademlia *Kademlia) handleLookUpContact(message Message, conn net.Conn) {
 }
 
 func (kademlia *Kademlia) LookupData(hash string) string {
+	if kademlia.dictionary[hash] != nil {
+		return string(kademlia.dictionary[hash])
+	}
 	location := NewKademliaID(hash)
 	recipient := kademlia.LookupContact(location)
 	res := kademlia.network.SendFindDataMessage(*recipient, hash)
