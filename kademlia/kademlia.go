@@ -114,7 +114,6 @@ func (kademlia *Kademlia) Store(data []byte) {
 	sha1 := sha1.Sum(data)
 	key := hex.EncodeToString(sha1[:])
 	location := NewKademliaID(key)
-	fmt.Println("Look up contact", location.String())
 	recipient := kademlia.LookupContact(location)
 	go kademlia.network.SendStoreMessage(*recipient, location, []byte(data))
 }
