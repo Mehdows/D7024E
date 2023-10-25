@@ -117,7 +117,7 @@ func (kademlia *Kademlia) Store(data []byte) {
 	location := NewKademliaID(key)
 	recipient := kademlia.LookupContact(location)
 	fmt.Println("Storing data at: ", location.String(), " on node: ", recipient.Address)
-	go kademlia.network.SendStoreMessage(*recipient, location, []byte(data))
+	go kademlia.network.SendStoreMessage(*recipient, location, data)
 }
 
 func (kademlia *Kademlia) handleStore(message Message) {

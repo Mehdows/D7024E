@@ -46,8 +46,8 @@ func Cli_handler(kademlia *Kademlia) {
 		} else if choice == "put" {
 			newres := strings.Join(res[1:], " ")
 			sha1 := sha1.Sum([]byte(newres))
-			newres = hex.EncodeToString(sha1[:])
-			id := NewKademliaID(newres)
+			res := hex.EncodeToString(sha1[:])
+			id := NewKademliaID(res)
 			kademlia.Store([]byte(newres))
 			fmt.Println("I will store a file with value: ", res[1:], " with hash: ", id.String())
 		} else if choice == "stored" {
