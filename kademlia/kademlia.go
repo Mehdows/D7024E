@@ -71,7 +71,7 @@ func (kademlia *Kademlia) LookupContact(target *KademliaID) (closestNode *Contac
 		shortList = append(shortList, response.Data.(*responseFindNodeData).Contacts...)
 		closest = shortList[len(shortList)-1]
 
-		if closest == oldClose {
+		if closest.ID == oldClose.ID {
 			fmt.Println("break")
 			break
 		} else {
@@ -84,6 +84,9 @@ func (kademlia *Kademlia) LookupContact(target *KademliaID) (closestNode *Contac
 func (kademlia *Kademlia) handleLookUpContact(message Message, conn net.Conn) {
 	data := message.Data.(*findNodeData)
 	recipients := kademlia.routingTable.FindClosestContacts(&data.Target, kademlia.k)
+	if kademlia.me.ID.Less(recipients[0].ID) {
+		recipients[0] = kademlia.me
+	}
 	kademlia.network.SendFindContactResponse(message, recipients, conn)
 }
 
