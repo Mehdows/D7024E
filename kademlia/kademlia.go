@@ -98,19 +98,17 @@ func (kademlia *Kademlia) LookupData(hash string) string {
 	location := NewKademliaID(hash)
 	recipient := kademlia.LookupContact(location)
 	res := kademlia.network.SendFindDataMessage(*recipient, hash)
-	byte := res.Data.(*[]byte)
-	str := string(*byte)
+	var str = ""
+	if res.Data != nil {
+		byte := res.Data.(*[]byte)
+		str = string(*byte)
+	}
 	return str
 }
 
 func (kademlia *Kademlia) handleLookupData(message Message, conn net.Conn) {
 	data := message.Data.(*findData)
-	if kademlia.dictionary[data.Target.String()] != nil {
-		kademlia.network.SendFindDataResponse(message, kademlia.dictionary[data.Target.String()], conn)
-	} else {
-		recipient := kademlia.routingTable.FindClosestContacts(&data.Target, kademlia.k)
-		kademlia.network.SendFindContactResponse(message, recipient, conn)
-	}
+	kademlia.network.SendFindDataResponse(message, kademlia.dictionary[data.Target.String()], conn)
 }
 
 func (kademlia *Kademlia) Store(data []byte) {
