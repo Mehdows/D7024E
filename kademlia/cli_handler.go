@@ -38,7 +38,7 @@ func Cli_handler(kademlia *Kademlia) {
 		res := strings.Split(text, " ")
 		choice := res[0]
 		// If the user wants to get a file write its hash
-		if choice == "get" && len(res) == 2 {
+		if choice == "get" && len(res) == 2 && len(res[1]) == 40 {
 			fmt.Println("I will get a file with hash: ", res[1])
 			res := kademlia.LookupData(res[1])
 			if res == "" {
