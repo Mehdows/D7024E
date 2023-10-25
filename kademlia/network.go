@@ -44,7 +44,9 @@ func (network *Network) SendPingMessage(reciever *Contact) string {
 	me := network.kademlia.me
 	message := NewPingMessage(me, *reciever)
 
+	fmt.Print("innan dial")
 	_ = network.dialAndSend(message)
+	fmt.Print("efter dial")
 
 	return "pong"
 
