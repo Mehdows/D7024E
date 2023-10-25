@@ -69,7 +69,7 @@ func (kademlia *Kademlia) LookupContact(target *KademliaID) (closestNode *Contac
 		response := net.SendFindContactMessage(&closest, target)
 		
 		shortList = append(shortList, response.Data.(*responseFindNodeData).Contacts...)
-		closest = target.Less(&closest.ID, &oldClose.ID, &closest.ID, &oldClose.ID)
+		closest = shortList[len(shortList)-1]
 
 		fmt.Print("Cloest: ", closest.ID.String(), " OldClose: ", oldClose.ID.String(), "\n")
 		if closest.ID.String() == oldClose.ID.String() {
