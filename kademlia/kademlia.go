@@ -94,10 +94,11 @@ func (kademlia *Kademlia) handleLookUpContact(message Message, conn net.Conn) {
 	kademlia.network.SendFindContactResponse(message, recipients, conn)
 }
 
-func (kademlia *Kademlia) LookupData(hash string) {
+func (kademlia *Kademlia) LookupData(hash string) []byte {
 	location := NewKademliaID(hash)
 	recipient := kademlia.LookupContact(location)
-	go kademlia.network.SendFindDataMessage(*recipient, hash)
+	res := kademlia.network.SendFindDataMessage(*recipient, hash)
+	return res.Data.([]byte)
 }
 
 func (kademlia *Kademlia) handleLookupData(message Message, conn net.Conn) {
