@@ -43,9 +43,7 @@ func (network *Network) handleConnection(conn net.Conn) {
 func (network *Network) SendPingMessage(reciever *Contact) string {
 	me := network.kademlia.me
 	message := NewPingMessage(me, *reciever)
-
 	_ = network.dialAndSend(message)
-
 	return "pong"
 
 }

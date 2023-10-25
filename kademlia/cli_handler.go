@@ -34,11 +34,9 @@ func Cli_handler(kademlia *Kademlia) {
 		}
 		// Holds the string that was scanned
 		text := scanner.Text()
-		fmt.Println("You entered: ", text)
 		// Holds the first word of the string
 		res := strings.Split(text, " ")
 		choice := res[0]
-		fmt.Println("You entered: ", choice)
 		// If the user wants to get a file write its hash
 		if choice == "get" && len(res) == 2 {
 			fmt.Println("I will get a file with hash: ", res[1])

@@ -116,7 +116,6 @@ func (kademlia *Kademlia) handleLookupData(message Message, conn net.Conn) {
 func (kademlia *Kademlia) Store(data []byte) {
 	sha1 := sha1.Sum(data)
 	key := hex.EncodeToString(sha1[:])
-
 	location := NewKademliaID(key)
 	recipient := kademlia.LookupContact(location)
 	fmt.Println("Storing data at: ", location.String(), " on node: ", recipient.Address)
