@@ -123,7 +123,7 @@ func (kademlia *Kademlia) Store(data []byte) {
 }
 
 func (kademlia *Kademlia) handleStore(message Message) {
-	data := message.Data.(*storeData)
+	data := message.Data.(storeData)
 	kademlia.dictionary[data.Location.String()] = data.Data
 }
 
@@ -143,7 +143,6 @@ func (Kademlia *Kademlia) HandleRequest(conn net.Conn, message Message) {
 		Kademlia.handleLookUpContact(message, conn)
 	case messageTypeFindValue:
 		Kademlia.handleLookupData(message, conn)
-
 	default:
 		panic("Invalid request " + string(rune(message.ID)))
 	}
