@@ -19,7 +19,10 @@ func Cli_handler(kademlia *Kademlia) {
 			if kademlia.routingTable.buckets[i].list.Len() == 0 {
 				continue
 			}
-			fmt.Println("Bucket ", i, ": ", kademlia.routingTable.buckets[i])
+			fmt.Println("Bucket ", i, ": ")
+			for i := kademlia.routingTable.buckets[i].list.Front(); i != nil; i = i.Next() {
+				fmt.Println("Contact: ", i.Value)
+			}
 		}
 
 		fmt.Print("Enter Text: ")
@@ -46,7 +49,10 @@ func Cli_handler(kademlia *Kademlia) {
 			id := NewKademliaID(newres)
 			kademlia.Store([]byte(newres))
 			fmt.Println("I will store a file with value: ", res[1:], " with hash: ", id.String())
-
+		} else if choice == "stored" {
+			for key, value := range kademlia.dictionary {
+				fmt.Println("Key: ", key, " Value: ", value)
+			}
 		} else if choice == "exit" {
 			fmt.Println("Exiting...")
 			break
