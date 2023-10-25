@@ -72,7 +72,7 @@ func (kademlia *Kademlia) LookupContact(target *KademliaID) (closestNode *Contac
 		closest = shortList[len(shortList)-1]
 
 		fmt.Print("Cloest: ", closest.ID.String(), " OldClose: ", oldClose.ID.String(), "\n")
-		if closest.ID == oldClose.ID {
+		if oldClose.ID.Equals(closest.ID) {
 			fmt.Println("break")
 			break
 		} else {
