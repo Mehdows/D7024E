@@ -103,7 +103,7 @@ func (kademlia *Kademlia) LookupData(hash string) string {
 }
 
 func (kademlia *Kademlia) handleLookupData(message Message, conn net.Conn) {
-	data := message.Data.(findData)
+	data := message.Data.(*findData)
 	if kademlia.dictionary[data.Target.String()] != nil {
 		kademlia.network.SendFindDataResponse(message, kademlia.dictionary[data.Target.String()], conn)
 	} else {
