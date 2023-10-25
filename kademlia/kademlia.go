@@ -3,8 +3,8 @@ package kademlia
 import (
 	"crypto/sha1"
 	"encoding/hex"
-	"net"
 	"fmt"
+	"net"
 )
 
 // Kademlia parameters
@@ -67,10 +67,10 @@ func (kademlia *Kademlia) LookupContact(target *KademliaID) (closestNode *Contac
 	for true {
 		// Send alpha FIND_NODE RPCs
 		response := net.SendFindContactMessage(&closest, target)
-		
+
 		shortList = append(shortList, response.Data.(*responseFindNodeData).Contacts...)
 		closest = shortList[len(shortList)-1]
-		
+
 		if closest == oldClose {
 			break
 		} else {
@@ -108,7 +108,7 @@ func (kademlia *Kademlia) Store(data []byte) {
 
 	location := NewKademliaID(key)
 	recipient := kademlia.LookupContact(location)
-	fmt.println("Storing data at: ", location.String())
+	fmt.Println("Storing data at: ", location.String())
 	go kademlia.network.SendStoreMessage(*recipient, location, []byte(data))
 }
 
