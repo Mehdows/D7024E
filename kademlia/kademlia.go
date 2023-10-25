@@ -4,6 +4,7 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"net"
+	"fmt"
 )
 
 // Kademlia parameters
@@ -107,6 +108,7 @@ func (kademlia *Kademlia) Store(data []byte) {
 
 	location := NewKademliaID(key)
 	recipient := kademlia.LookupContact(location)
+	fmt.println("Storing data at: ", location.String())
 	go kademlia.network.SendStoreMessage(*recipient, location, []byte(data))
 }
 

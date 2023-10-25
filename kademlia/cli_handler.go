@@ -38,7 +38,6 @@ func Cli_handler(kademlia *Kademlia) {
 
 			// If the user wants to store a file write its value
 		} else if choice == "put" {
-			
 			newres := strings.Join(res[1:], " ")
 			sha1 := sha1.Sum([]byte(newres))
 			newres = hex.EncodeToString(sha1[:])
