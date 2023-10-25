@@ -73,7 +73,7 @@ func (kademlia *Kademlia) LookupContact(target *KademliaID) (closestNode *Contac
 
 
 		fmt.Print("Cloest: ", closest.ID.String(), " OldClose: ", oldClose.ID.String(), "\n")
-		if closest == oldClose {
+		if closest.ID.String() == oldClose.ID.String() {
 			break
 		} else {
 			oldClose = closest
@@ -107,11 +107,9 @@ func (kademlia *Kademlia) handleLookupData(message Message, conn net.Conn) {
 func (kademlia *Kademlia) Store(data []byte) {
 	sha1 := sha1.Sum(data)
 	key := hex.EncodeToString(sha1[:])
-	fmt.Println("1")
 	location := NewKademliaID(key)
 	fmt.Println("Look up contact", location.String())
 	recipient := kademlia.LookupContact(location)
-	fmt.Println("STOOOOOOOOOOOORE")
 	go kademlia.network.SendStoreMessage(*recipient, location, []byte(data))
 }
 
