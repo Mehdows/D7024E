@@ -41,7 +41,11 @@ func Cli_handler(kademlia *Kademlia) {
 		if choice == "get" && len(res) == 2 {
 			fmt.Println("I will get a file with hash: ", res[1])
 			res := kademlia.LookupData(res[1])
-			fmt.Print("File content: ", string(res))
+			if res == "" {
+				fmt.Println("File not found")
+			} else {
+				fmt.Println("File content: ", res)
+			}
 			// If the user wants to store a file write its value
 		} else if choice == "put" {
 			newres := strings.Join(res[1:], " ")
