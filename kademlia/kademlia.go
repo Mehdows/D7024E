@@ -98,8 +98,11 @@ func (kademlia *Kademlia) LookupData(hash string) string {
 	location := NewKademliaID(hash)
 	recipient := kademlia.LookupContact(location)
 	res := kademlia.network.SendFindDataMessage(*recipient, hash)
-	byte := res.Data.(*[]byte)
-	str := string(*byte)
+	var str = ""
+	if res.Data != nil {
+		byte := res.Data.(*[]byte)
+		str = string(*byte)
+	}
 	return str
 }
 
