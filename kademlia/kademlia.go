@@ -103,7 +103,7 @@ func (kademlia *Kademlia) LookupData(hash string) string {
 }
 
 func (kademlia *Kademlia) handleLookupData(message Message, conn net.Conn) {
-	data := message.Data.(*findData)
+	data := message.Data.(findData)
 	if kademlia.dictionary[data.Target.String()] != nil {
 		kademlia.network.SendFindDataResponse(message, kademlia.dictionary[data.Target.String()], conn)
 	} else {
@@ -123,7 +123,7 @@ func (kademlia *Kademlia) Store(data []byte) {
 }
 
 func (kademlia *Kademlia) handleStore(message Message) {
-	data := message.Data.(storeData)
+	data := message.Data.(*storeData)
 	kademlia.dictionary[data.Location.String()] = data.Data
 }
 
