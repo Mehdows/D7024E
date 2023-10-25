@@ -28,6 +28,10 @@ func Cli_handler(kademlia *Kademlia) {
 		fmt.Print("Enter Text: ")
 		// reads user input until \n by default
 		scanner.Scan()
+		// handle error
+		if scanner.Err() != nil {
+			fmt.Println("Error: ", scanner.Err())
+		}
 		// Holds the string that was scanned
 		text := scanner.Text()
 		fmt.Println("You entered: ", text)
@@ -42,12 +46,17 @@ func Cli_handler(kademlia *Kademlia) {
 
 			// If the user wants to store a file write its value
 		} else if choice == "put" {
-
+			fmt.Println("1")
 			newres := strings.Join(res[1:], " ")
+			fmt.Println("2")
 			sha1 := sha1.Sum([]byte(newres))
+			fmt.Println("3")
 			newres = hex.EncodeToString(sha1[:])
+			fmt.Println("4")
 			id := NewKademliaID(newres)
+			fmt.Println("5")
 			kademlia.Store([]byte(newres))
+			fmt.Println("6")
 			fmt.Println("I will store a file with value: ", res[1:], " with hash: ", id.String())
 		} else if choice == "stored" {
 			for key, value := range kademlia.dictionary {
@@ -62,8 +71,4 @@ func Cli_handler(kademlia *Kademlia) {
 		}
 	}
 
-	// handle error
-	if scanner.Err() != nil {
-		fmt.Println("Error: ", scanner.Err())
-	}
 }
