@@ -53,7 +53,7 @@ func Cli_handler(kademlia *Kademlia) {
 			res := hex.EncodeToString(sha1[:])
 			id := NewKademliaID(res)
 			kademlia.Store([]byte(newres))
-			fmt.Println("I will store a file with value: ", res[1:], " with hash: ", id.String())
+			fmt.Println("I will store a file with value: ", newres, " with hash: ", id.String())
 		} else if choice == "stored" {
 			for key, value := range kademlia.dictionary {
 				fmt.Println("Key: ", key, " Value: ", value)
