@@ -2,6 +2,8 @@ package kademlia
 
 import (
 	"bufio"
+	"crypto/sha1"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"strings"
@@ -36,9 +38,13 @@ func Cli_handler(kademlia *Kademlia) {
 
 			// If the user wants to store a file write its value
 		} else if choice == "put" {
-			fmt.Println("I will store a file with value: ", res[1:])
+			
 			newres := strings.Join(res[1:], " ")
-			kademlia.Store(newres)
+			sha1 := sha1.Sum([]byte(newres))
+			newres = hex.EncodeToString(sha1[:])
+			id := NewKademliaID(newres)
+			kademlia.Store([]byte(newres))
+			fmt.Println("I will store a file with value: ", res[1:], " with hash: ", id.String())
 
 		} else if choice == "exit" {
 			fmt.Println("Exiting...")
