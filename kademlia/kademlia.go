@@ -8,7 +8,7 @@ import (
 )
 
 // Kademlia parameters
-const alpha int = 1
+const alpha int = 3
 
 type Kademlia struct {
 	me                Contact
@@ -61,15 +61,15 @@ func (kademlia *Kademlia) LookupContact(target *KademliaID) (closestNode *Contac
 	// Create a shortlist for the search
 	shortList := kademlia.routingTable.FindClosestContacts(target, alpha)
 
-	closest := shortList[0]
-	oldClose := shortList[0]
+	closest := findClosestInShortlist(shortList, target)
+	oldClose := closest
 
 	for true {
 		// Send alpha FIND_NODE RPCs
 		response := net.SendFindContactMessage(&closest, target)
 
 		shortList = append(shortList, response.Data.(*responseFindNodeData).Contacts...)
-		closest = shortList[len(shortList)-1]
+		closest = findClosestInShortlist(shortList, target)
 
 		fmt.Print("Cloest: ", closest.ID.String(), " OldClose: ", oldClose.ID.String(), "\n")
 		if oldClose.ID.Equals(closest.ID) {
@@ -80,6 +80,22 @@ func (kademlia *Kademlia) LookupContact(target *KademliaID) (closestNode *Contac
 		}
 	}
 	return &closest
+}
+
+func findClosestInShortlist(shortList []Contact, target *KademliaID) Contact {
+	closestDistance := target.CalcDistance(shortList[0].ID)
+	closestNode := shortList[0]
+	for i := 1; i < len(shortList); i++ {
+		con := shortList[i]
+		distance := target.CalcDistance(con.ID)
+
+		if distance.Less(closestDistance) {
+			closestDistance = distance
+			closestNode = shortList[i]
+		}
+
+	}
+	return closestNode
 }
 
 func (kademlia *Kademlia) handleLookUpContact(message Message, conn net.Conn) {

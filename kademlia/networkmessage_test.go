@@ -55,8 +55,8 @@ func TestNewFindNodeMessage(t *testing.T) {
 	if message.IsResponse != false {
 		t.Errorf("NewFindNodeMessage() = %t; want %t", message.IsResponse, false)
 	}
-	if message.Data.(*findNodeData).Target != *target {
-		t.Errorf("NewFindNodeMessage() = %s; want %s", message.Data.(*findNodeData).Target, target)
+	if message.Data.(findNodeData).Target != *target {
+		t.Errorf("NewFindNodeMessage() = %s; want %s", message.Data.(findNodeData).Target, target)
 	}
 }
 
@@ -77,8 +77,8 @@ func TestNewFindNodeResponse(t *testing.T) {
 	if message.IsResponse != true {
 		t.Errorf("NewFindNodeResponse() = %t; want %t", message.IsResponse, true)
 	}
-	if message.Data.(*responseFindNodeData).Contacts[0] != contact {
-		t.Errorf("NewFindNodeResponse() = %v; want %v", message.Data.(*responseFindNodeData).Contacts[0], contact)
+	if message.Data.(responseFindNodeData).Contacts[0] != contact {
+		t.Errorf("NewFindNodeResponse() = %v; want %v", message.Data.(responseFindNodeData).Contacts[0], contact)
 	}
 }
 
@@ -183,7 +183,7 @@ func TestNewStoreData(t *testing.T) {
 	}
 }
 
-func TestSerializeMessage(t *testing.T) {
+func TestSerializeMessageStoreData(t *testing.T) {
 
 	var deserialized Message
 	data := NewStoreData(*NewRandomKademliaID(), []byte("data"))
@@ -191,7 +191,6 @@ func TestSerializeMessage(t *testing.T) {
 	message := NewStoreMessage(contact, contact, data)
 	serialized := SerializeMessage(&message)
 	DeserializeMessage(serialized, &deserialized)
-
 
 	if deserialized.Sender.String() != message.Sender.String() {
 		t.Errorf("SerializeMessage() = %s; want %s", deserialized.Sender.String(), message.Sender.String())
@@ -214,4 +213,65 @@ func TestSerializeMessage(t *testing.T) {
 	if deserialized.Data.(*storeData).DataLength != message.Data.(storeData).DataLength {
 		t.Errorf("SerializeMessage() = %d; want %d", deserialized.Data.(*storeData).DataLength, message.Data.(storeData).DataLength)
 	}
+}
+
+func TestSerializeMessageFindValue(t *testing.T) {
+
+	var deserialized Message
+	contact := NewContact(NewRandomKademliaID(), "localhost:8080")
+	message := NewFindValueMessage(contact, contact, *NewRandomKademliaID())
+	serialized := SerializeMessage(&message)
+	DeserializeMessage(serialized, &deserialized)
+
+	if deserialized.IsResponse != message.IsResponse {
+		t.Errorf("SerializeMessage() = %t; want %t", deserialized.IsResponse, message.IsResponse)
+	}
+	if deserialized.Data.(*findData).Target != message.Data.(findData).Target {
+		t.Errorf("SerializeMessage() = %s; want %s", deserialized.Data.(*findData).Target, message.Data.(findData).Target)
+	}
+
+	deserialized = Message{}
+	contact = NewContact(NewRandomKademliaID(), "localhost:8080")
+	message = NewFindValueResponse(contact, contact, []byte("data"))
+	serialized = SerializeMessage(&message)
+	DeserializeMessage(serialized, &deserialized)
+
+	if deserialized.IsResponse != message.IsResponse {
+		t.Errorf("SerializeMessage() = %t; want %t", deserialized.IsResponse, message.IsResponse)
+	}
+	desData := deserialized.Data.(*[]byte)
+	data := message.Data.([]byte)
+	if string(*desData) != string(data) {
+		t.Errorf("SerializeMessage() = %s; want %s", string(*desData), string(data))
+	}
+
+}
+
+func TestSerializeMessageFindNode(t *testing.T) {
+
+	var deserialized Message
+	contact := NewContact(NewRandomKademliaID(), "localhost:8080")
+	message := NewFindNodeMessage(contact, contact, *NewRandomKademliaID())
+	serialized := SerializeMessage(&message)
+	DeserializeMessage(serialized, &deserialized)
+
+	if deserialized.IsResponse != message.IsResponse {
+		t.Errorf("SerializeMessage() = %t; want %t", deserialized.IsResponse, message.IsResponse)
+	}
+	if deserialized.Data.(*findNodeData).Target != message.Data.(findNodeData).Target {
+		t.Errorf("SerializeMessage() = %s; want %s", deserialized.Data.(*findNodeData).Target, message.Data.(findNodeData).Target)
+	}
+
+	contact = NewContact(NewRandomKademliaID(), "localhost:8080")
+	message = NewFindNodeResponse(contact, contact, []Contact{contact})
+	serialized = SerializeMessage(&message)
+	DeserializeMessage(serialized, &deserialized)
+
+	if deserialized.IsResponse != message.IsResponse {
+		t.Errorf("SerializeMessage() = %t; want %t", deserialized.IsResponse, message.IsResponse)
+	}
+	if deserialized.Data.(*responseFindNodeData).Contacts[0].String() != message.Data.(responseFindNodeData).Contacts[0].String() {
+		t.Errorf("SerializeMessage() = %s; want %s", deserialized.Data.(*responseFindNodeData).Contacts[0].String(), message.Data.(responseFindNodeData).Contacts[0].String())
+	}
+
 }
