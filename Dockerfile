@@ -11,7 +11,7 @@
 # $ docker build . -t kadlab
 # docker run -p 8080:8080 -tid kadlab
 
-FROM golang:latest
+FROM golang
 
 WORKDIR /app
 RUN cd /app
